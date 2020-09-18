@@ -1,6 +1,5 @@
 # imports
 from opentrons import labware, instruments
-import pandas as pd
 
 # metadata
 metadata = {
@@ -31,19 +30,7 @@ p10 = instruments.P10_Single(
 # Setup Overview
 # 1) Pipette PCR MMix from fuge_rack A1 to PCR plate
 # 2) Distribute primers into wells 
-rxn_number = 48
 ##########################
-
-
-
-# Procedure
-# distribute MMix
-# p300.distribute(18, fuge_rack('A1'), pcr_plate.wells('A1', 'A2'),
-#     disposal_vol=10)
-
-# distribute primers
-# in which wells should we dispense 1ul F primer F20_Bam-sfGFP?
-# find wells filtered where search = F20_BamsfGFP
 
 F_primer = [
 'F20_Bam-sfGFP',
@@ -142,13 +129,6 @@ R_primer = [
 'F20_HA_sfGFP2'
 ]
 
-print ("There are ", len(F_primer), " F primer and ", len(R_primer), " R primers.")
-
-unique_F_primers = set(F_primer)
-unique_R_primers = set(R_primer)
-print ("Unique F primers: ", unique_F_primers)
-print ("Unique R primers: ", unique_R_primers)
-
 position = [
 'A1',
 'B1',
@@ -197,9 +177,12 @@ position = [
 'E6'
 ]
 
-#make dataframe of F, R primers and positions. Easy for looping
-df =pd.DataFrame(list(zip(F_primer, R_primer, position)), columns=['F_primer', 'R_primer', 'Position'])
-#print (df.head(5))
+print ("There are ", len(F_primer), " F primer and ", len(R_primer), " R primers.")
+
+unique_F_primers = set(F_primer)
+unique_R_primers = set(R_primer)
+print ("Unique F primers: ", unique_F_primers)
+print ("Unique R primers: ", unique_R_primers)
 
 primer_locs = {
 'F20_Bam-sfGFP': 'A2',
@@ -210,29 +193,40 @@ primer_locs = {
 'F20_M13AR': 'B3'
 }
 
+# Procedure
+# distribute MMix
+p300.distribute(18, fuge_rack('A1'), pcr_plate.cols('1', '2', '3', '4', '5', '6'),
+    disposal_vol=2, touch_tip=True, new_tip='always')
+
+# distribute primers
+# in which wells should we dispense 1ul F primer F20_Bam-sfGFP?
+# find wells filtered where search = F20_BamsfGFP
+
 for fwd in unique_F_primers: 
     print ("Pipetting FWD primer, ", fwd)
-    # in df return positions where F primer = "F20_Bam-sfGFP"
-    # save this to array of positions e.g [A1, B2, B4]
-    myposarray = df[df['F_primer']==fwd].Position.tolist() 
+    # match this to array of positions e.g [A1, B2, B4]
+    myposarray = []
+    for pos, match in enumerate(F_primer):
+        if fwd == match:
+            myposarray.append(position[pos])
+    # myposarray = df[df['F_primer']==fwd].Position.tolist() 
     # pipette 1ul at each of those positions
     print ("Will distribute 1 ul from fuge_rack", primer_locs[fwd], "into wells:", myposarray)
     # wellarray = tuple(myposarray)
-    p10.distribute(1, fuge_rack('A2'), pcr_plate.wells(myposarray), disposal_vol=5)
+    p10.distribute(1, fuge_rack(primer_locs[fwd]), pcr_plate.wells(myposarray), new_tip='always', touch_tip=True, disposal_vol=1)
     
-
-
-# for rev in unique_R_primers: 
-#     print ("Pipetting REV primer, ", rev)
-#     # in df return positions where F primer = "F20_Bam-sfGFP"
-#     # save this to array of positions e.g [A1, B2, B4]
-#     myposarray = df[df['R_primer']==rev].Position.tolist() 
-#     # pipette 1ul at each of those positions
-#     print ("Will distribute 1 ul from fuge_rack", primer_locs[rev], "into wells:", myposarray)
-#     p10.distribute(1, fuge_rack(primer_locs[rev]), pcr_plate.wells(well for well in myposarray), disposal_vol=5)
-
-
-
+for rev in unique_R_primers: 
+    print ("Pipetting REV primer, ", rev)
+    # match this to array of positions e.g [A1, B2, B4]
+    myposarray = []
+    for pos, match in enumerate(R_primer):
+        if rev == match:
+            myposarray.append(position[pos])
+    # myposarray = df[df['F_primer']==fwd].Position.tolist() 
+    # pipette 1ul at each of those positions
+    print ("Will distribute 1 ul from fuge_rack", primer_locs[rev], "into wells:", myposarray)
+    # wellarray = tuple(myposarray)
+    p10.distribute(1, fuge_rack(primer_locs[rev]), pcr_plate.wells(myposarray), new_tip='always', touch_tip=True, disposal_vol=1)
 
 
 
