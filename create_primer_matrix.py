@@ -11,22 +11,20 @@ metadata = {
 ##########################
 def run(protocol: protocol_api.ProtocolContext):
 
-    # labware
+    # LABWARE
     fuge_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', '6')
     tiprack300 = protocol.load_labware('opentrons_96_tiprack_300ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_tiprack_20ul', '7')
 
-    # pipettes
+    # PIPETTES
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
     p20 = protocol.load_instrument(
         'p20_single_gen2', 'right', tip_racks=[tiprack20]
     )
-    
-    ###### commands ######
-    
-    # reagent locations
+     
+    # REAGENTS
     pos_control = fuge_rack['A1']
     liquid_trash = fuge_rack['B1']
     water = fuge_rack['C1']
@@ -50,6 +48,18 @@ def run(protocol: protocol_api.ProtocolContext):
     mmx_rev_5 = fuge_rack['D5'] # e.g. 7.5uM
     mmx_rev_6 = fuge_rack['D6'] # e.g. 10uM
     
+     ###### COMMANDS ######
+# OT2 commands
+# split mmix into 2 tubes: NFC and pos control
+# to Mmix_NTC tube, add 59.5ul water, mix, aliquot to row H, all wells
+# to Mmix, add 20ul pos control, mix. Aliquot 203.5ul to 6 'mmix_N2_Rev tubes'
+# From 'N2_Rev_10uM' tube, add in schedule to all 6 'mmix_N2_Rev tubes'
+# from WATER tube, add amounts in schedule to all 6 'mmix_N2_Rev' tubes
+# From each 'mmix_N2_rev' tube, add to each well in row as shown in figure.
+# Mix 100ul 'N2_Fwd' dilutions in tube by adding water and "N2_Fwd 10uM" tube as shown in schedule
+# Pipette 1.6ul 'N2_Fwd' to 12wells starting with lowest conc first, left to right, top to bottom.
+
+
 
     ## make stds
     # add TE buffer to tubes, make blank
