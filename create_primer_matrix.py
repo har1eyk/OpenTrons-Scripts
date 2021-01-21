@@ -15,6 +15,8 @@ def run(protocol: protocol_api.ProtocolContext):
     fuge_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', '6')
     tiprack300 = protocol.load_labware('opentrons_96_tiprack_300ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_tiprack_20ul', '7')
+    tempdeck = protocol.load_module('tempdeck', '3')
+    sample_plate = tempdeck.load_labware('biorad_96_wellplate_200ul_pcr')
 
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -48,16 +50,33 @@ def run(protocol: protocol_api.ProtocolContext):
     mmx_rev_5 = fuge_rack['D5'] # e.g. 7.5uM
     mmx_rev_6 = fuge_rack['D6'] # e.g. 10uM
     
-     ###### COMMANDS ######
-# OT2 commands
-# split mmix into 2 tubes: NFC and pos control
-# to Mmix_NTC tube, add 59.5ul water, mix, aliquot to row H, all wells
-# to Mmix, add 20ul pos control, mix. Aliquot 203.5ul to 6 'mmix_N2_Rev tubes'
-# From 'N2_Rev_10uM' tube, add in schedule to all 6 'mmix_N2_Rev tubes'
-# from WATER tube, add amounts in schedule to all 6 'mmix_N2_Rev' tubes
-# From each 'mmix_N2_rev' tube, add to each well in row as shown in figure.
-# Mix 100ul 'N2_Fwd' dilutions in tube by adding water and "N2_Fwd 10uM" tube as shown in schedule
-# Pipette 1.6ul 'N2_Fwd' to 12wells starting with lowest conc first, left to right, top to bottom.
+    ###### COMMANDS ######
+    # split mmix into 2 tubes: NFC and pos control
+    p300.transfer(
+        200.5,
+        mmix.bottom(3),
+        mmix_NTC.bottom(3),
+        mix_before=(3, 300),
+        blow_out=True)
+    p300.transfer(
+        59.5,
+        water.bottom(3),
+        mmix_NTC.bottom(3),
+        mix_after=(3, 225),
+        blow_out=True)
+    p20.distribute(
+        20,
+        mmix_NTC.bottom(3),
+        sample_plate.rows_by_name()['H'])
+ 
+
+    # to Mmix_NTC tube, add 59.5ul water, mix, aliquot to row H, all wells
+    # to Mmix, add 20ul pos control, mix. Aliquot 203.5ul to 6 'mmix_N2_Rev tubes'
+    # From 'N2_Rev_10uM' tube, add in schedule to all 6 'mmix_N2_Rev tubes'
+    # from WATER tube, add amounts in schedule to all 6 'mmix_N2_Rev' tubes
+    # From each 'mmix_N2_rev' tube, add to each well in row as shown in figure.
+    # Mix 100ul 'N2_Fwd' dilutions in tube by adding water and "N2_Fwd 10uM" tube as shown in schedule
+    # Pipette 1.6ul 'N2_Fwd' to 12wells starting with lowest conc first, left to right, top to bottom.
 
 
 
@@ -145,4 +164,4 @@ def run(protocol: protocol_api.ProtocolContext):
     #     mix_before=(1, 100),
     #     blow_out=True,
     #     mix_after=(3,225),
-    #     new_tip='always')    
+    #     new_tip='always')  
