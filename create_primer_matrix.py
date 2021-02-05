@@ -170,7 +170,6 @@ def run(protocol: protocol_api.ProtocolContext):
             N2_fwd_vol[first_two],
             fwd_10uM,
             all_fwd[first_two].bottom(3),
-            blow_out=True,
             new_tip='always', 
             blowout_location='destination well')
     
@@ -180,7 +179,6 @@ def run(protocol: protocol_api.ProtocolContext):
             N2_fwd_vol[last_four+offset],
             fwd_10uM,
             all_fwd[last_four+offset].bottom(1),
-            blow_out=True,
             new_tip='always',
             blowout_location='destination well') #! last well, misses aspiration, about 20ul remaining, about 50ul short. More in source tube.
     # mix N2_fwd    
