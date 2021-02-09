@@ -52,18 +52,26 @@ def run(protocol: protocol_api.ProtocolContext):
     # lists
     plate_col = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     all_mmx_rev = [mmx_rev_1, mmx_rev_2, mmx_rev_3, mmx_rev_4, mmx_rev_5, mmx_rev_6]
-    plate_rows = ['B', 'C', 'D', 'E', 'F', 'G', 'H']
+    plate_rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G'] #H is for 
     # all_fwd = [fwd_1, fwd_2, fwd_3, fwd_4, fwd_5, fwd_6]
 
     ##### COMMANDS ######
     # transfer sybr to plate, 3x per well
-    p300.transfer(
-        54,
-        mmix.bottom(3),
-        mmix_NTC.bottom(3),
-        mix_before=(3, 300),
-        blow_out=True,
-        blowout_location='destination well')
+    p300.aspirate(250, mmix_NTC.bottom(0.5)) #3*12*18 = 
+    for well in plate_col:
+        well_pos = 'H'+well
+        p300.flow_rate.dispense = 50 #92.86 default
+        p300.dispense(20, sample_plate[well_pos])
+        p300.touch_tip()
+        p300.flow_rate.dispense = 92.86 #92.86 default, return to normal
+        p300.drop_tip()
+    # p300.transfer(
+    #     54,
+    #     mmix.bottom(3),
+    #     mmix_NTC.bottom(3),
+    #     mix_before=(3, 300),
+    #     blow_out=True,
+    #     blowout_location='destination well')
     
     # to mmix_NTC tube, add 16 ul N2_fwd and N2_rev primers
     p20.transfer(
