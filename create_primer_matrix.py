@@ -80,7 +80,7 @@ def run(protocol: protocol_api.ProtocolContext):
         blow_out=True,
         blowout_location='destination well')
 
-    # to Mmix_NTC tube, add 59.5ul water, mix, aliquot to row H, all wells
+    # to Mmix_NTC tube, add 27.4ul water, mix, aliquot to row H, all wells
     p300.pick_up_tip()
     p300.aspirate(27.4, water.bottom(5)) #1500ul
     p300.dispense(27.4, mmix_NTC)
@@ -136,20 +136,20 @@ def run(protocol: protocol_api.ProtocolContext):
         blowout_location='destination well') 
 
     # mix mmix_N2_rev tubes and add to each well in row as shown in figure.
-    for i in range(len(all_mmx_rev)): #mix mmix_N2 #!combine mixing and dispensing step below
+    for i in range(len(all_mmx_rev)): #mix mmix_N2, combine mixing and dispensing step below to keep tip
         p300.pick_up_tip()
         p300.flow_rate.aspirate = 92.86 #reset to default
         p300.flow_rate.dispense = 92.86 #reset to default
         p300.mix(3, 200, all_mmx_rev[i].bottom(2)) #in well: 
         p300.flow_rate.aspirate = 40
         p300.flow_rate.dispense = 40
-        p300.aspirate(232, all_mmx_rev[i].bottom(0.4)) # 23.4*20=220.8+9.2= 232ul
+        p300.aspirate(232, all_mmx_rev[i].bottom(0.2)) # 23.4*20=220.8+9.2= 232ul
         protocol.delay(seconds=2) #wait for equilibration
         p300.dispense(2, liquid_trash) #remove case of air in tip
         p300.touch_tip() #prime tip
-        for col in plate_col:  # distribute to every well in row
-            well_pos = plate_rows[i]+col
-            p300.dispense(18.4, sample_plate[well_pos].bottom(0.5))
+        for x in range(0, len(plate_col), 2):  # distribute to every other col
+            well_pos = plate_rows[i]+plate_col[x] # var i can be used to loop through rows since each mmix is on its own row
+            p300.dispense(36.8, sample_plate[well_pos].bottom(0.5))
             p300.touch_tip()
         p300.drop_tip()
     p300.flow_rate.aspirate = 92.86 #default
@@ -165,14 +165,15 @@ def run(protocol: protocol_api.ProtocolContext):
         new_tip='once')
 
     N2_fwd_vol = [6.25, 12.5, 25, 50, 75, 100] #from N2_fwd tube @ 10uM
-    for first_two in range(len(N2_fwd_vol[0:2])):
+    # first two with vol < 20ul
+    for first_two in range(len(N2_fwd_vol[0:2])): 
         p20.transfer(
             N2_fwd_vol[first_two],
             fwd_10uM,
             all_fwd[first_two].bottom(3),
             new_tip='always', 
             blowout_location='destination well')
-    
+    # last four with vol>20
     for last_four in range(len(N2_fwd_vol[2:6])):
         offset = 2
         p300.transfer(
@@ -181,23 +182,34 @@ def run(protocol: protocol_api.ProtocolContext):
             all_fwd[last_four+offset].bottom(1),
             new_tip='always',
             blowout_location='destination well') #! last well, misses aspiration, about 20ul remaining, about 50ul short. More in source tube.
+    
     # mix N2_fwd    
     for tube in range(len(N2_fwd_vol)):
         p300.pick_up_tip()
         p300.mix(2, 78, all_fwd[tube])
         p300.drop_tip()
     
-    # Pipette 1.6ul 'N2_Fwd' to 12wells starting with lowest conc first, left to right, top to bottom.
-    for tube in range(len(all_fwd)): #loop through all N2_fwd tubes
-        stepper = tube+tube #tube 1 to A1,A2; tube 2 to A3,A4 etc. with same tip
-        for col in range(len(plate_col[stepper:stepper+2:2])): #slices two items but only loops once
-            p20.pick_up_tip()
-            p20.aspirate(20, all_fwd[tube].bottom(1))
-            for row in range(len(plate_rows)):
-                fw = plate_rows[row]+plate_col[stepper+col] # A1 firstwell
-                sw = plate_rows[row]+plate_col[stepper+col+1] # A2 secondwell
-                p20.dispense(1.6, sample_plate[fw])
-                p20.touch_tip()
-                p20.dispense(1.6, sample_plate[sw])
-                p20.touch_tip()
-            p20.drop_tip()
+    # Pipette 3.2ul 'N2_Fwd' to every other well in col[A-F], every-other col
+    for i in range(len(all_fwd)): #loop through all N2_fwd tubes
+        p20.pick_up_tip()
+        p20.aspirate(20, all_fwd[i].bottom(1))
+        # need 3.2ul in A1, B1, C1, D1..F1
+        for x in range(0, len(plate_rows)):  # distribute to every other col
+            well_pos = plate_rows[x]+plate_col[2*i] # var i can be used to loop through rows since each mmix is on its own row
+            p20.dispense(3.2, sample_plate[well_pos].bottom(0.5))
+            p20.touch_tip()
+        p20.drop_tip()
+
+    # mix tubes containing N2_fwd and dispense 20ul to neighboring well
+    for j in range(0, len(plate_col), 2): #loop through columns, 
+        p20.pick_up_tip()
+        for x, row in enumerate(plate_rows):
+            source = row+plate_col[j] 
+            dest = row+plate_col[j+1] #neighbor well
+            p20.mix(2, 20, sample_plate[source].bottom(2)) # need to mix more
+            p20.aspirate(20, sample_plate[source])
+            p20.dispense(20, sample_plate[dest]) 
+            p20.move_to(sample_plate[dest].bottom(5)) #mm. Prevent air bubble at bottom
+            p20.blow_out()
+            p20.touch_tip()
+        p20.drop_tip()
