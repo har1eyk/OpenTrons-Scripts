@@ -51,62 +51,62 @@ def run(protocol: protocol_api.ProtocolContext):
     probe_wells=['A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'G7', 'A10', 'B10', 'C10', 'D10', 'E10']
     std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12]
     
-    # ##### COMMANDS ######
-    # ## Mix, pipette 54ul mm_Sybr, mm_Probe to each well on plate 
-    # for mmix, dest_wells in zip( # loop through both mmix and wells list
-    #     list([mm_Sybr, mm_Probe]),
-    #     list([sybr_wells, probe_wells])):
-    #     p300.pick_up_tip()
-    #     p300.mix(3, 300, mmix.bottom(10)) #10mm from bottom
-    #     p300.flow_rate.aspirate = 40
-    #     p300.flow_rate.dispense = 40
-    #     for well in dest_wells:
-    #         p300.well_bottom_clearance.aspirate = 0.4 #mm
-    #         p300.aspirate(56, mmix)
-    #         protocol.delay(seconds=2) #tip equilibrate
-    #         p300.touch_tip()
-    #         p300.dispense(56, stds_plate[well])
-    #         p300.touch_tip()
-    #     p300.drop_tip()
-    #     p300.flow_rate.aspirate = 92.86 #reset to default
-    #     p300.flow_rate.dispense = 92.86 #reset to default
-    #     p300.well_bottom_clearance.aspirate = 10 #mm default
+    ##### COMMANDS ######
+    ## Mix, pipette 54ul mm_Sybr, mm_Probe to each well on plate 
+    for mmix, dest_wells in zip( # loop through both mmix and wells list
+        list([mm_Sybr, mm_Probe]),
+        list([sybr_wells, probe_wells])):
+        p300.pick_up_tip()
+        p300.mix(3, 300, mmix.bottom(10)) #10mm from bottom
+        p300.flow_rate.aspirate = 40
+        p300.flow_rate.dispense = 40
+        for well in dest_wells:
+            p300.well_bottom_clearance.aspirate = 0.4 #mm
+            p300.aspirate(56, mmix)
+            protocol.delay(seconds=2) #tip equilibrate
+            p300.touch_tip()
+            p300.dispense(56, stds_plate[well])
+            p300.touch_tip()
+        p300.drop_tip()
+        p300.flow_rate.aspirate = 92.86 #reset to default
+        p300.flow_rate.dispense = 92.86 #reset to default
+        p300.well_bottom_clearance.aspirate = 10 #mm default
     
-    # ### Make std dilution series      
-    # #Make 10nM pos control
-    # p20.transfer(
-    #     10,
-    #     pos_control, #1uM
-    #     std_1.bottom(20),
-    #     mix_after=(2, 20), # remove residual fluid from tip
-    #     blow_out=True,
-    #     touch_tip=True,
-    #     blowout_location='destination well'
-    # )
+    ### Make std dilution series      
+    #Make 10nM pos control
+    p20.transfer(
+        10,
+        pos_control, #1uM
+        std_1.bottom(20),
+        mix_after=(2, 20), # remove residual fluid from tip
+        blow_out=True,
+        touch_tip=True,
+        blowout_location='destination well'
+    )
    
-    # # serial dilutions in microfuge tubes, 10% diliutions
-    # p300.pick_up_tip()
-    # for i in range(len(std_wells)-1):
-    #     p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
-    #     p300.well_bottom_clearance.dispense = 15 #mm 
-    #     p300.mix(3, 300, std_wells[i])
-    #     p300.well_bottom_clearance.aspirate = 10 #mm 
-    #     p300.flow_rate.aspirate = 40 #slow aspirate; no air
-    #     p300.aspirate(100, std_wells[i])
-    #     p300.touch_tip()
-    #     p300.flow_rate.dispense = 40 #slow dispense
-    #     p300.dispense(100, std_wells[i+1])
-    #     p300.flow_rate.aspirate = 92.86 #default
-    #     p300.flow_rate.dispense = 92.86 #default
-    #     p300.mix(2, 200, std_wells[i+1]) #remove residual inside tip
-    #     p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
-    #     p300.blow_out()
-    #     protocol.delay(seconds=2) #wait for bubbles to subside
-    # p300.well_bottom_clearance.dispense = 1 #mm default
-    # p300.well_bottom_clearance.aspirate = 1 #mm default
-    # p300.flow_rate.aspirate = 92.86 #default
-    # p300.flow_rate.dispense = 92.86 #default
-    # p300.drop_tip()
+    # serial dilutions in microfuge tubes, 10% diliutions
+    p300.pick_up_tip()
+    for i in range(len(std_wells)-1):
+        p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
+        p300.well_bottom_clearance.dispense = 15 #mm 
+        p300.mix(3, 300, std_wells[i])
+        p300.well_bottom_clearance.aspirate = 10 #mm 
+        p300.flow_rate.aspirate = 40 #slow aspirate; no air
+        p300.aspirate(100, std_wells[i])
+        p300.touch_tip()
+        p300.flow_rate.dispense = 40 #slow dispense
+        p300.dispense(100, std_wells[i+1])
+        p300.flow_rate.aspirate = 92.86 #default
+        p300.flow_rate.dispense = 92.86 #default
+        p300.mix(2, 200, std_wells[i+1]) #remove residual inside tip
+        p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
+        p300.blow_out()
+        protocol.delay(seconds=2) #wait for bubbles to subside
+    p300.well_bottom_clearance.dispense = 1 #mm default
+    p300.well_bottom_clearance.aspirate = 1 #mm default
+    p300.flow_rate.aspirate = 92.86 #default
+    p300.flow_rate.dispense = 92.86 #default
+    p300.drop_tip()
 
     # add 6ul stds to SYBR, PROBE mmxs into plate wells and dispense into neighboring wells
     for mmix in list([sybr_wells, probe_wells]): #loop through mmixes
