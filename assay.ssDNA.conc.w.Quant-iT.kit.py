@@ -24,8 +24,6 @@ def run(protocol: protocol_api.ProtocolContext):
         'p20_single_gen2', 'right', tip_racks=[tiprack20]
     )
     
-    ###### commands ######
-    
     # reagent locations
     te_bufr = fuge_rack['D1']
     te_bufr_2 = fuge_rack['D2']
@@ -41,7 +39,6 @@ def run(protocol: protocol_api.ProtocolContext):
     std_7 = fuge_rack['B5']
     std_8 = fuge_rack['B6']
     blank_std = fuge_rack['A2']
-
     all_stds = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8]
     # samples
     sample_1 = fuge_rack['C4']
@@ -58,14 +55,15 @@ def run(protocol: protocol_api.ProtocolContext):
     # all_stds_bl = all_stds + [blank_std]
     # all_stds_bl_r = all_stds_bl
     # all_stds_bl_r.reverse()
-
-    ## make stds
-    # add TE buffer to tubes, make blank
+    
+    ###### commands ######
+    ## MAKE STDS
+    # add 125ul TE buffer to tubes, make blank
     p300.pick_up_tip()
     p300.aspirate(125, te_bufr)
     p300.dispense(125, blank_std) # make blank std
     p300.aspirate(150, te_bufr) 
-    p300.dispense(125, std_1) # make std_1
+    p300.dispense(120, std_1) # make std_1, 5ul from pos control
     # add TE buffer to sample_1 tubes
     p300.aspirate(250-vol_from_sample, te_bufr_2) 
     p300.dispense(250-vol_from_sample, sample_1_dil) # make sample_1 dil
@@ -86,7 +84,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.blow_out(liquid_trash)
     p300.drop_tip()
 
-    # add ssDNA_std
+    # add 5ul ssDNA_std, 
     p20.transfer(
         5,
         ssDNA_std.bottom(3),
