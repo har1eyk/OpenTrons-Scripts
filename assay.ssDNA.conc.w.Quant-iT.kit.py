@@ -47,7 +47,7 @@ def run(protocol: protocol_api.ProtocolContext):
     sample_2 = fuge_rack['D4']
     sample_2_dil = fuge_rack['D5']
     sample_2_dil_half = fuge_rack['D6']
-    vol_from_sample = 5 # how much primer vol (ul) to add to 125ul TE buffer
+    vol_from_sample = 10 # how much primer vol (ul) to add to 125ul TE buffer
 
     all_samples = [sample_1_dil, sample_1_dil_half, sample_2_dil, sample_2_dil_half]
     all_stds_samples = (all_stds + all_samples)
@@ -58,14 +58,16 @@ def run(protocol: protocol_api.ProtocolContext):
     
     ###### commands ######
     ## MAKE STDS
-    # add 125ul TE buffer to tubes, make blank
+    # add 125ul TE buffer to blank, 115ul to std_1 tube and various to samples
     p300.pick_up_tip()
+    # blank
     p300.aspirate(125, te_bufr)
     p300.dispense(125, blank_std) # make blank std
+    # add 120ul to std_1
     p300.aspirate(150, te_bufr) 
-    p300.dispense(120, std_1) # make std_1, 5ul from pos control
+    p300.dispense(115, std_1) # make std_1, 10ul from pos control
     # add TE buffer to sample_1 tubes
-    p300.aspirate(250-vol_from_sample, te_bufr_2) 
+    p300.aspirate(250-vol_from_sample, te_bufr_2) # account for sample vol added to this tube for dil
     p300.dispense(250-vol_from_sample, sample_1_dil) # make sample_1 dil
     p300.aspirate(125, te_bufr_2)
     p300.dispense(125, sample_1_dil_half) # make sample_1 dil in half
@@ -76,17 +78,15 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.dispense(125, sample_2_dil_half) # make sample_2 dil in half
     # p300.drop_tip() # in trash
     
-    # transfer 125ul to all std tubes
+    # transfer 125ul to all std tubes, std_1 tot vol = 240
     p300.transfer(125, te_bufr, all_stds, new_tip='never') # transfer 125ul to all std tubes
-    # for i in range(len(all_stds)):
-        # p300.transfer(125, te_bufr, all_stds[i]) # add 125ul from te_bufr tube to all std tubes
-    # p300.pick_up_tip()
     p300.blow_out(liquid_trash)
     p300.drop_tip()
 
-    # add 5ul ssDNA_std, 
+    # dil ssDNA_std by adding 10ul to std_1
+    # std_1 tot vol = 240+10 =250ul
     p20.transfer(
-        5,
+        10,
         ssDNA_std.bottom(3),
         std_1.bottom(3),
         mix_before=(2, 20),
@@ -103,7 +103,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.drop_tip()
         # p300.transfer(125, all_stds[i], all_stds[i+1], mix_before=(2, 100), mix_after=(2,100))
 
-    # dilute unknown primers
+    # dilute unknown samples e.g. primers
     p20.transfer(
         vol_from_sample,
         sample_1.bottom(3),
@@ -118,6 +118,7 @@ def run(protocol: protocol_api.ProtocolContext):
         mix_before=(2, 10),
         blow_out=True,
         mix_after=(2,20))
+    
     # serially dilute samples with vol from above
     # need to step by 2 so I don't have sample_1_dil_half mixing with sample_2_dil as in list
     # just want 0->1 and 2->3 not 1->2
