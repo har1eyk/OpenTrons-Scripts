@@ -52,47 +52,47 @@ def run(protocol: protocol_api.ProtocolContext):
     # LISTS
     sybr_wells=['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'A4', 'B4', 'C4', 'D4', 'E4', 'F4']
     probe_wells=['A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'G7', 'A10', 'B10', 'C10', 'D10', 'E10', 'F10']
-    std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12]
+    std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, water]
     tip_heights = [] #in future, put tip heights here.
     
-    # ##### COMMANDS ######
-    # ## Mix, pipette 54ul mm_Sybr, mm_Probe to each well on plate 
-    # for mmix, dest_wells in zip( # loop through both mmix and wells list
-    #     list([mm_Sybr, mm_Probe]),
-    #     list([sybr_wells, probe_wells])):
-    #     p300.pick_up_tip()
-    #     p300.mix(3, 200, mmix.bottom(10)) #10mm from bottom
-    #     p300.flow_rate.aspirate = 30
-    #     p300.flow_rate.dispense = 40
-    #     for well in dest_wells:
-    #         p300.well_bottom_clearance.aspirate = 0.6 #mm
-    #         p300.aspirate(56, mmix)
-    #         protocol.delay(seconds=3) #tip equilibrate
-    #         p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
-    #         protocol.delay(seconds=1) #tip equilibrate
-    #         p300.touch_tip()
-    #         protocol.delay(seconds=1) #tip residue form outside droplet
-    #         p300.move_to(mmix.bottom(38)) # move to center, don't catch front lip of tube
-    #         protocol.delay(seconds=3) #tip residue form outside droplet
-    #         p300.touch_tip()
-    #         p300.dispense(56, stds_plate[well])
-    #         p300.touch_tip()
-    #     p300.drop_tip()
-    #     p300.flow_rate.aspirate = 92.86 #reset to default
-    #     p300.flow_rate.dispense = 92.86 #reset to default
-    #     p300.well_bottom_clearance.aspirate = 10 #mm default
+    ##### COMMANDS ######
+    ## Mix, pipette 54ul mm_Sybr, mm_Probe to each well on plate 
+    for mmix, dest_wells in zip( # loop through both mmix and wells list
+        list([mm_Sybr, mm_Probe]),
+        list([sybr_wells, probe_wells])):
+        p300.pick_up_tip()
+        p300.mix(3, 200, mmix.bottom(10)) #10mm from bottom
+        p300.flow_rate.aspirate = 30
+        p300.flow_rate.dispense = 40
+        for well in dest_wells:
+            p300.well_bottom_clearance.aspirate = 0.6 #mm
+            p300.aspirate(56, mmix)
+            protocol.delay(seconds=3) #tip equilibrate
+            p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
+            protocol.delay(seconds=1) #tip equilibrate
+            p300.touch_tip()
+            protocol.delay(seconds=1) #tip residue form outside droplet
+            p300.move_to(mmix.bottom(38)) # move to center, don't catch front lip of tube
+            protocol.delay(seconds=3) #tip residue form outside droplet
+            p300.touch_tip()
+            p300.dispense(56, stds_plate[well])
+            p300.touch_tip()
+        p300.drop_tip()
+        p300.flow_rate.aspirate = 92.86 #reset to default
+        p300.flow_rate.dispense = 92.86 #reset to default
+        p300.well_bottom_clearance.aspirate = 10 #mm default
     
-    # ## Make std dilution series      
-    # # Make 10nM pos control
-    # p20.transfer(
-    #     10,
-    #     pos_control, #1uM
-    #     std_1.bottom(20),
-    #     mix_after=(2, 20), # remove residual fluid from tip
-    #     blow_out=True,
-    #     touch_tip=True,
-    #     blowout_location='destination well'
-    # )
+    ## Make std dilution series      
+    # Make 10nM pos control
+    p20.transfer(
+        10,
+        pos_control, #1uM
+        std_1.bottom(20),
+        mix_after=(2, 20), # remove residual fluid from tip
+        blow_out=True,
+        touch_tip=True,
+        blowout_location='destination well'
+    )
    
     # serial dilutions in microfuge tubes, 10% diliutions
     p300.pick_up_tip()
@@ -101,7 +101,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.well_bottom_clearance.dispense = 15 #mm 
         if i==0 or i==10: # first or last tube
             p300.mix(3, 200, std_wells[i]) # need to add mixes to first and last tubes
-        p300.mix(4, 200, std_wells[i])
+        p300.mix(3, 200, std_wells[i])
         # p300.well_bottom_clearance.aspirate = 10 #mm 
         p300.flow_rate.aspirate = 40 #slow aspirate; no air
         p300.aspirate(100, std_wells[i])
@@ -110,7 +110,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.dispense(100, std_wells[i+1])
         p300.flow_rate.aspirate = 92.86 #default
         p300.flow_rate.dispense = 92.86 #default
-        p300.mix(2, 200, std_wells[i+1]) #remove residual inside tip
+        p300.mix(3, 200, std_wells[i+1]) #remove residual inside tip
         p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
         p300.blow_out()
         protocol.delay(seconds=2) #wait for bubbles to subside
@@ -124,7 +124,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.flow_rate.aspirate = 7.56 #default
     p20.flow_rate.dispense = 7.56 #default
     for mmix in list([sybr_wells, probe_wells]): #loop through mmixes
-        for i in range(len(std_wells)): #loop 12x
+        for i in range(len(std_wells)): #loop 13x water tube last
             p20.pick_up_tip()
             p300.pick_up_tip()
             # move 6ul from std tube to well
@@ -138,14 +138,15 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.blow_out()
             p20.touch_tip()
             # p300 necessary for mixing
+            p300.move_to(stds_plate[mmix[i]].bottom(50)) # add this so it doesn't crash into plate
             p300.move_to(stds_plate[mmix[i]].bottom(1)) #above mmix solution
-            p300.mix(4, 50, stds_plate[mmix[i]].bottom(2)) # can't be mixed homogenously with p20 #ivetried
+            p300.mix(4, 50, stds_plate[mmix[i]].bottom(1)) # can't be mixed homogenously with p20 #ivetried
             p300.move_to(stds_plate[mmix[i]].bottom(5)) #above mmix solution
             protocol.delay(seconds=2) #outside fluid coalesce 
             p300.blow_out()
             p300.touch_tip()
-            p20.well_bottom_clearance.aspirate = 2 # bring up for more forceful mix
-            p20.well_bottom_clearance.dispense = 2 # move close to avoid air gap
+            p20.well_bottom_clearance.aspirate = 1 # bring up for more forceful mix
+            p20.well_bottom_clearance.dispense = 1 # move close to avoid air gap
             for x in range(1,3): # need int 1 and 2
                 p20.aspirate(20, stds_plate[mmix[i]]) # asp from 54ul, dispense to neighbor well
                 protocol.delay(seconds=2) #equilibrate
