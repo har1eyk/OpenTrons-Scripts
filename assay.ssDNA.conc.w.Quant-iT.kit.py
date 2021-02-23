@@ -48,7 +48,7 @@ def run(protocol: protocol_api.ProtocolContext):
     sample_2_dil = fuge_rack['D5']
     sample_2_dil_half = fuge_rack['D6']
     vol_from_sample = 10 # how much primer vol (ul) to add to 125ul TE buffer
-
+    vol_from_std = 20 # how much ssDNA standard to add to 125ul TE buffer
     all_samples = [sample_1_dil, sample_1_dil_half, sample_2_dil, sample_2_dil_half]
     all_stds_samples = (all_stds + all_samples)
     all_stds_samples_bl = all_stds_samples + [blank_std]
@@ -65,7 +65,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.dispense(125, blank_std) # make blank std
     # add 120ul to std_1
     p300.aspirate(150, te_bufr) 
-    p300.dispense(115, std_1) # make std_1, 10ul from pos control
+    p300.dispense(150-vol_from_std, std_1) # make std_1
     # add TE buffer to sample_1 tubes
     p300.aspirate(250-vol_from_sample, te_bufr_2) # account for sample vol added to this tube for dil
     p300.dispense(250-vol_from_sample, sample_1_dil) # make sample_1 dil
@@ -86,7 +86,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # dil ssDNA_std by adding 10ul to std_1
     # std_1 tot vol = 240+10 =250ul
     p20.transfer(
-        10,
+        vol_from_std,
         ssDNA_std.bottom(3),
         std_1.bottom(3),
         mix_before=(2, 20),
