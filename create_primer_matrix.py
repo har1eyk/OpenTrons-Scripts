@@ -475,7 +475,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.flow_rate.aspirate = 30 
         p300.flow_rate.dispense = 40 
         for i in range(0,2): # split 1..12 dispensing in half
-            p300.aspirate(R_mix_rxn*2*3, tube.bottom(0.5))
+            p300.aspirate(R_mix_rxn*2*3, tube.bottom(0.5)) # 18.4 *2 wells * 3 times on row
             protocol.delay(seconds=3)
             for j in range(1+6*i,6+6*i,2): #1,3,5->7,9,11; distribute to every other col
                 dest = row+str(j)
