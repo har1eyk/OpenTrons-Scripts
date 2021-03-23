@@ -93,8 +93,8 @@ def run(protocol: protocol_api.ProtocolContext):
     NTC_mix = stds_rack['D6'] # empty, receives sN_mix and water as NTC
     
     #fuge_rack
-    bpwd_mix = fuge_rack['A1'] #empty
-    liquid_trash = fuge_rack['B1']
+    # bpwd_mix = fuge_rack['A1'] #empty
+    # liquid_trash = fuge_rack['B1']
     MIX_bw = fuge_rack['D1'] # see sheet, but gen around 1705 ul; use 2mL tube
     probe_10uM = fuge_rack['C1']
     fwd_10uM = fuge_rack['C2'] # min 300ul
@@ -221,22 +221,6 @@ def run(protocol: protocol_api.ProtocolContext):
     probe_mixes = [probe_mix_1, probe_mix_2, probe_mix_3, probe_mix_4, probe_mix_5, probe_mix_6]
     P_in_mix = [P_50_int_primer, P_100_int_primer, P_200_int_primer, P_400_int_primer, P_600_int_primer, P_800_int_primer]
     W_in_mix = [P_50_int_water, P_100_int_water, P_200_int_water, P_400_int_water, P_600_int_water, P_800_int_water]
-    # # more lists
-    # R_mix_primer=[R_50_mix, R_100_mix, R_200_mix, R_400_mix, R_600_mix, R_800_mix]
-    # R_mix_water=[R_50_woff_mix, R_100_woff_mix, R_200_woff_mix, R_400_woff_mix, R_600_woff_mix, R_800_woff_mix]
-    # F_mix_primer=[F_50_int_primer, F_100_int_primer, F_200_int_primer, F_400_int_primer, F_600_int_primer, F_800_int_primer]
-    # F_mix_water=[F_50_int_water, F_100_int_water, F_200_int_water, F_400_int_water, F_600_int_water, F_800_int_water]
-
-    # # Mixes
-    # BPW_mix_tot = BPW_rxn*(1+percent_waste)*tot_rxns  # Mix = base + probe + water (no DNA, F, R primer)*96*waste. (in ul)
-    # sN_mix_tot = BWP_mix_xfer_sN_mix+std_woff_add_to_sN_mix+F_add_to_sN_mix+R_add_to_sN_mix # Mix = base + probe + water + F,R primers at std conc + water offset (no DNA) * number stds_NTC * waste
-    # bpwd_mix_tot = bpw_mix_xfer_bpwd_mix+std_DNA_xfer_to_bpwd_mix # Mix = base + probe + DNA (no F, R primer) 
-    # R_50_mix = bpwd_mix_xfer_R_mix+R_50_mix+R_50_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
-    # R_100_mix = bpwd_mix_xfer_R_mix+R_100_mix+R_100_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
-    # R_200_mix = bpwd_mix_xfer_R_mix+R_200_mix+R_200_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
-    # R_400_mix = bpwd_mix_xfer_R_mix+R_400_mix+R_400_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
-    # R_600_mix = bpwd_mix_xfer_R_mix+R_600_mix+R_600_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
-    # R_800_mix = bpwd_mix_xfer_R_mix+R_800_mix+R_800_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
     
     #### COMMANDS ######
     # make pos control standards
