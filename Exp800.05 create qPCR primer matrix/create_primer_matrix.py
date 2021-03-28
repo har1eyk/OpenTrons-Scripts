@@ -242,42 +242,42 @@ def run(protocol: protocol_api.ProtocolContext):
     R_600_mix = bpwd_mix_xfer_R_mix+R_600_mix+R_600_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
     R_800_mix = bpwd_mix_xfer_R_mix+R_800_mix+R_800_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
     
-    ##### COMMANDS ######
-    # make pos control standards
-    # transfer from pos_control to make std_1
-    pos_control_height = tip_heights(900,1,10)
-    p20.transfer(
-        10,
-        pos_control.bottom(pos_control_height[0]), #1uM
-        std_1.bottom(20),
-        mix_after=(2, 20), # remove residual fluid from tip
-        touch_tip=True
-    )
+    # ##### COMMANDS ######
+    # # make pos control standards
+    # # transfer from pos_control to make std_1
+    # pos_control_height = tip_heights(900,1,10)
+    # p20.transfer(
+    #     10,
+    #     pos_control.bottom(pos_control_height[0]), #1uM
+    #     std_1.bottom(20),
+    #     mix_after=(2, 20), # remove residual fluid from tip
+    #     touch_tip=True
+    # )
     
-    # serial dilutions in microfuge tubes, 10% diliutions
-    p300.pick_up_tip()
-    for i in range(len(std_wells)-2): #don't want out of range because i + 1
-        p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
-        p300.well_bottom_clearance.dispense = 15 #mm 
-        last_std_tube = len(std_wells)-2 # (int) position of last std tube; last tube = water
-        if i==0 or i==last_std_tube: # first or last std tube; not water
-            p300.mix(3, 200,std_tubes[i]) # need to add mixes to first and last tubes
-        p300.mix(3, 200,std_tubes[i])
-        # p300.well_bottom_clearance.aspirate = 10 #mm 
-        p300.flow_rate.aspirate = 40 #slow aspirate; no air
-        p300.aspirate(100,std_tubes[i])
-        p300.touch_tip()
-        p300.flow_rate.dispense = 40 #slow dispense
-        p300.dispense(100,std_tubes[i+1])
-        p300.flow_rate.aspirate = 92.86 #default
-        p300.flow_rate.dispense = 92.86 #default
-        p300.mix(3, 200,std_tubes[i+1]) #remove residual inside tip
-        # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
-        p300.blow_out()
-        protocol.delay(seconds=2) #wait for bubbles to subside
-    p300.well_bottom_clearance.dispense = 1 #mm default
-    p300.well_bottom_clearance.aspirate = 1 #mm default
-    p300.drop_tip()
+    # # serial dilutions in microfuge tubes, 10% diliutions
+    # p300.pick_up_tip()
+    # for i in range(len(std_wells)-2): #don't want out of range because i + 1
+    #     p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
+    #     p300.well_bottom_clearance.dispense = 15 #mm 
+    #     last_std_tube = len(std_wells)-2 # (int) position of last std tube; last tube = water
+    #     if i==0 or i==last_std_tube: # first or last std tube; not water
+    #         p300.mix(3, 200,std_tubes[i]) # need to add mixes to first and last tubes
+    #     p300.mix(3, 200,std_tubes[i])
+    #     # p300.well_bottom_clearance.aspirate = 10 #mm 
+    #     p300.flow_rate.aspirate = 40 #slow aspirate; no air
+    #     p300.aspirate(100,std_tubes[i])
+    #     p300.touch_tip()
+    #     p300.flow_rate.dispense = 40 #slow dispense
+    #     p300.dispense(100,std_tubes[i+1])
+    #     p300.flow_rate.aspirate = 92.86 #default
+    #     p300.flow_rate.dispense = 92.86 #default
+    #     p300.mix(3, 200,std_tubes[i+1]) #remove residual inside tip
+    #     # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
+    #     p300.blow_out()
+    #     protocol.delay(seconds=2) #wait for bubbles to subside
+    # p300.well_bottom_clearance.dispense = 1 #mm default
+    # p300.well_bottom_clearance.aspirate = 1 #mm default
+    # p300.drop_tip()
 
     # prepare sN_mix
     # add BPW_mix to sN_mix tube
@@ -379,8 +379,8 @@ def run(protocol: protocol_api.ProtocolContext):
             row = well.split()[0][0]
             dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
             p20.well_bottom_clearance.dispense = 0
-            p20.dispense(20, plate[dest])
-            p20.move_to(plate[dest].bottom(2))
+            p20.dispense(20, plate[dest].bottom(2))
+            p20.move_to(plate[dest].bottom(5))
             p20.blow_out()
             # p20.touch_tip()
         p300.drop_tip()
@@ -450,7 +450,6 @@ def run(protocol: protocol_api.ProtocolContext):
         all_R_mix, # list
         blow_out=True,
         new_tip='always',
-        mix_after=(2, 20),
         blowout_location='destination well', 
     )
     # add water

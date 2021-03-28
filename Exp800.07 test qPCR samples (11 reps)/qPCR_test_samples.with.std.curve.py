@@ -155,45 +155,45 @@ def run(protocol: protocol_api.ProtocolContext):
     std_mixes = [std_1mix, std_2mix, std_3mix, std_4mix, std_5mix, std_6mix, std_7mix, NTC_mix]
     std_wells = ['G1', 'G4', 'G7', 'G10', 'H1', 'H4', 'H7', 'H10']
     samp_wells = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1']
-    samp_sources = [std_14, std_15, std_16, std_17, std_18, std_19]
+    samp_sources = [std_13, std_14, std_15, std_16, samp_1, samp_2]
     
     
-    #### COMMANDS ######
-    # make pos control standards
-    # transfer from pos_control to make std_1
-    pos_control_height = tip_heights(400,1,10)
-    p20.transfer(
-        10,
-        pos_control.bottom(pos_control_height[0]), #1uM
-        std_1.bottom(20),
-        mix_after=(2, 20), # remove residual fluid from tip
-        touch_tip=True
-    )
+    # #### COMMANDS ######
+    # # make pos control standards
+    # # transfer from pos_control to make std_1
+    # pos_control_height = tip_heights(400,1,10)
+    # p20.transfer(
+    #     10,
+    #     pos_control.bottom(pos_control_height[0]), #1uM
+    #     std_1.bottom(20),
+    #     mix_after=(2, 20), # remove residual fluid from tip
+    #     touch_tip=True
+    # )
     
-    # serial dilutions in microfuge tubes, 10% diliutions
-    p300.pick_up_tip()
-    for i in range(len(all_std_tubes)-1): #don't want out of range because i + 1
-        p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
-        p300.well_bottom_clearance.dispense = 15 #mm 
-        last_std_tube = len(all_std_tubes)-1 # (int) position of last std tube; last tube = WATER
-        if i==0 or i==last_std_tube: # first or last std tube; not WATER
-            p300.mix(3, 200, all_std_tubes[i]) # need to add mixes to first and last tubes
-        p300.mix(3, 200, all_std_tubes[i])
-        # p300.well_bottom_clearance.aspirate = 10 #mm 
-        p300.flow_rate.aspirate = 40 #slow aspirate; no air
-        p300.aspirate(100,all_std_tubes[i])
-        p300.touch_tip()
-        p300.flow_rate.dispense = 40 #slow dispense
-        p300.dispense(100, all_std_tubes[i+1])
-        p300.flow_rate.aspirate = 92.86 #default
-        p300.flow_rate.dispense = 92.86 #default
-        p300.mix(3, 200,all_std_tubes[i+1]) #remove residual inside tip
-        # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
-        p300.blow_out()
-        protocol.delay(seconds=2) #wait for bubbles to subside
-    p300.well_bottom_clearance.dispense = 1 #mm default
-    p300.well_bottom_clearance.aspirate = 1 #mm default
-    p300.drop_tip()
+    # # serial dilutions in microfuge tubes, 10% diliutions
+    # p300.pick_up_tip()
+    # for i in range(len(all_std_tubes)-1): #don't want out of range because i + 1
+    #     p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
+    #     p300.well_bottom_clearance.dispense = 15 #mm 
+    #     last_std_tube = len(all_std_tubes)-1 # (int) position of last std tube; last tube = WATER
+    #     if i==0 or i==last_std_tube: # first or last std tube; not WATER
+    #         p300.mix(3, 200, all_std_tubes[i]) # need to add mixes to first and last tubes
+    #     p300.mix(3, 200, all_std_tubes[i])
+    #     # p300.well_bottom_clearance.aspirate = 10 #mm 
+    #     p300.flow_rate.aspirate = 40 #slow aspirate; no air
+    #     p300.aspirate(100,all_std_tubes[i])
+    #     p300.touch_tip()
+    #     p300.flow_rate.dispense = 40 #slow dispense
+    #     p300.dispense(100, all_std_tubes[i+1])
+    #     p300.flow_rate.aspirate = 92.86 #default
+    #     p300.flow_rate.dispense = 92.86 #default
+    #     p300.mix(3, 200,all_std_tubes[i+1]) #remove residual inside tip
+    #     # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
+    #     p300.blow_out()
+    #     protocol.delay(seconds=2) #wait for bubbles to subside
+    # p300.well_bottom_clearance.dispense = 1 #mm default
+    # p300.well_bottom_clearance.aspirate = 1 #mm default
+    # p300.drop_tip()
 
     # Mastermix contains primers and probe. Everything except DNA. Aliquot to 6 tubes.
     # transfer sN_mix to intermediate tubes (std_mixes)

@@ -222,42 +222,42 @@ def run(protocol: protocol_api.ProtocolContext):
     P_in_mix = [P_50_int_primer, P_100_int_primer, P_200_int_primer, P_400_int_primer, P_600_int_primer, P_800_int_primer]
     W_in_mix = [P_50_int_water, P_100_int_water, P_200_int_water, P_400_int_water, P_600_int_water, P_800_int_water]
     
-    #### COMMANDS ######
-    # make pos control standards
-    # transfer from pos_control to make std_1
-    pos_control_height = tip_heights(900,1,10)
-    p20.transfer(
-        10,
-        pos_control.bottom(pos_control_height[0]), #1uM
-        std_1.bottom(20),
-        mix_after=(2, 20), # remove residual fluid from tip
-        touch_tip=True
-    )
+    # #### COMMANDS ######
+    # # make pos control standards
+    # # transfer from pos_control to make std_1
+    # pos_control_height = tip_heights(900,1,10)
+    # p20.transfer(
+    #     10,
+    #     pos_control.bottom(pos_control_height[0]), #1uM
+    #     std_1.bottom(20),
+    #     mix_after=(2, 20), # remove residual fluid from tip
+    #     touch_tip=True
+    # )
     
-    # serial dilutions in microfuge tubes, 10% diliutions
-    p300.pick_up_tip()
-    for i in range(len(std_tubes)-2): #don't want out of range because i + 1
-        p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
-        p300.well_bottom_clearance.dispense = 15 #mm 
-        last_std_tube = len(std_tubes)-2 # (int) position of last std tube; last tube = water
-        if i==0 or i==last_std_tube: # first or last std tube; not water
-            p300.mix(3, 200,std_tubes[i]) # need to add mixes to first and last tubes
-        p300.mix(3, 200,std_tubes[i])
-        # p300.well_bottom_clearance.aspirate = 10 #mm 
-        p300.flow_rate.aspirate = 40 #slow aspirate; no air
-        p300.aspirate(100,std_tubes[i])
-        p300.touch_tip()
-        p300.flow_rate.dispense = 40 #slow dispense
-        p300.dispense(100,std_tubes[i+1])
-        p300.flow_rate.aspirate = 92.86 #default
-        p300.flow_rate.dispense = 92.86 #default
-        p300.mix(3, 200,std_tubes[i+1]) #remove residual inside tip
-        # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
-        p300.blow_out()
-        protocol.delay(seconds=2) #wait for bubbles to subside
-    p300.well_bottom_clearance.dispense = 1 #mm default
-    p300.well_bottom_clearance.aspirate = 1 #mm default
-    p300.drop_tip()
+    # # serial dilutions in microfuge tubes, 10% diliutions
+    # p300.pick_up_tip()
+    # for i in range(len(std_tubes)-2): #don't want out of range because i + 1
+    #     p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
+    #     p300.well_bottom_clearance.dispense = 15 #mm 
+    #     last_std_tube = len(std_tubes)-2 # (int) position of last std tube; last tube = water
+    #     if i==0 or i==last_std_tube: # first or last std tube; not water
+    #         p300.mix(3, 200,std_tubes[i]) # need to add mixes to first and last tubes
+    #     p300.mix(3, 200,std_tubes[i])
+    #     # p300.well_bottom_clearance.aspirate = 10 #mm 
+    #     p300.flow_rate.aspirate = 40 #slow aspirate; no air
+    #     p300.aspirate(100,std_tubes[i])
+    #     p300.touch_tip()
+    #     p300.flow_rate.dispense = 40 #slow dispense
+    #     p300.dispense(100,std_tubes[i+1])
+    #     p300.flow_rate.aspirate = 92.86 #default
+    #     p300.flow_rate.dispense = 92.86 #default
+    #     p300.mix(3, 200,std_tubes[i+1]) #remove residual inside tip
+    #     # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
+    #     p300.blow_out()
+    #     protocol.delay(seconds=2) #wait for bubbles to subside
+    # p300.well_bottom_clearance.dispense = 1 #mm default
+    # p300.well_bottom_clearance.aspirate = 1 #mm default
+    # p300.drop_tip()
 
     # prepare sN_mix
     # add MIX_bw to sN_mix tube
@@ -357,7 +357,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p20.mix(2, 20, intTube.bottom(3)) #ensure vol in tip in intTube and washed
         p20.blow_out()
         p300.move_to(intTube.bottom(40)) #prevent tip from crashing into tube cap
-        p300.mix(3, 50, intTube.bottom(1))
+        p300.mix(4, 50, intTube.bottom(1))
         protocol.delay(seconds=2)
         # p300.move_to(intTube.bottom(10)) #prevent air bubbles in mmix during blow out
         p300.blow_out(intTube.bottom(10))
@@ -401,7 +401,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.flow_rate.aspirate = 92.86 #default
     p300.flow_rate.dispense = 92.86 #default
     h = tip_heights(mix_bw_tot-mix_bw_XFR_mix_sn, len(split_asp(mix_bw_XFR_samp_int, p300_max_vol)), 408.48)#split_asp(mix_bw_XFR_samp_int, p300_max_vol)[0])
-    p300.mix(3, 200, MIX_bw.bottom(h[0]-10))
+    p300.mix(6, 200, MIX_bw.bottom(h[0]-10)) # need to thoroughly mix DNA in tube
     for tube in samp_tubes:
         for j in range(len(split_asp(mix_bw_XFR_samp_int, p300_max_vol))): # split_asp is a function that returns equally divided aspirations
             p300.flow_rate.aspirate = 40 #default
@@ -510,7 +510,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for tube, pvol in zip(probe_mixes[0:3], P_in_mix[0:3]): # first three tubes have vol < 20ul
         p20.transfer(
             pvol,
-            probe_10uM.bottom(1),
+            probe_10uM.bottom(2),
             tube.bottom(3),
             blow_out=True,
             mix_after=(2, pvol),
@@ -525,7 +525,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for tube, pvol in zip(probe_mixes[3:], P_in_mix[3:]): # item 3 till end    
         p300.transfer(
             pvol,
-            probe_10uM.bottom(1),
+            probe_10uM.bottom(2),
             tube.bottom(2), 
             blow_out=True,
             blowout_location='destination well',
