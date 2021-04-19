@@ -7,3 +7,6 @@ Does.amplifyt.plate.def.work.py
 210310_create_primer_matrix.txt
 Exp800.06.OT-2.commands.txt
 qPCR.test.samples.with.std.curve.txt
+Exp800.04 create qPCR std curve with unknown pos control/exp800.04_create_qPCR_std_curve_OT2_lines.txt
+Exp800.07 test qPCR samples (11 reps)/15ul.OT-2.instruction.list.txt
+Exp800.07 test qPCR samples (11 reps)/IAC_vs_pos_control_OT-2_moves.txt
