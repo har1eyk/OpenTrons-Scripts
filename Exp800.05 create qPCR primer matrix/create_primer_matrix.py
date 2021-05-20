@@ -31,7 +31,7 @@ def tip_heights(init_vol, steps, vol_dec):
         h = p5*x**5+p4*x**4+p3*x**3+p2*x**2+p1*x**1 + p0
         h = h-offset
         if h < 8: # prevent negative heights; go to bottom to avoid air aspirant above certain height
-            h = 0        
+            h = 1        
             heights.append(h)
         else:
             heights.append(round(h, 1))
@@ -60,7 +60,8 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
-    plate = tempdeck.load_labware('amplifyt_96_aluminumblock_300ul')
+    # plate = tempdeck.load_labware('amplifyt_96_aluminumblock_300ul')
+    plate = tempdeck.load_labware('abi_96_wellplate_250ul')
 
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -152,9 +153,9 @@ def run(protocol: protocol_api.ProtocolContext):
     F_int_vol = 100 # What is the volume of F intermediate primer in new tube? (in ul)
     percent_waste =  0.20 # What percentage waste? (decimal)
     sN_mix_waste_offset = 0.025  # How much percent_waste offset should sN_mix use? This calculated as percent_waste-sN_mix_overage = percent_waste for sN_mix_overage e.g. (20-7=13%) Should not be 0 otherwise offset = percent_waste. (decimal)
-    R_mix_waste_offset = 0.1  # How much percent_waste offset should R_mix use? This calculated as percent_waste-R_mix_overage = percent_waste for R_mix_overage e.g. (20-=13%) If 0, then offset = percent_waste. (decimal)
+    R_mix_waste_offset = 0.11  # How much percent_waste offset should R_mix use? This calculated as percent_waste-R_mix_overage = percent_waste for R_mix_overage e.g. (20-=13%) If 0, then offset = percent_waste. (decimal)
     std_NTC_waste_offset = 0.028 # How much percent_waste offset should std_NTC use? (decimal)
-    bpw_waste_offset = 0.03 # How much percent_waste offset should bpw_waste use? (decimal)
+    bpw_waste_offset = 0.032 # How much percent_waste offset should bpw_waste use? (decimal)
     p300_max_vol = 200
 
 
@@ -242,6 +243,10 @@ def run(protocol: protocol_api.ProtocolContext):
     R_600_mix = bpwd_mix_xfer_R_mix+R_600_mix+R_600_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
     R_800_mix = bpwd_mix_xfer_R_mix+R_800_mix+R_800_woff_mix # Mix = base + probe + DNA+ R primer (No F primer)
     
+    print ("BWP_mix_xfer_sN_mix", BWP_mix_xfer_sN_mix)
+    print ("bpw_mix_xfer_bpwd_mix", bpw_mix_xfer_bpwd_mix)
+   
+   
     # ##### COMMANDS ######
     # # make pos control standards
     # # transfer from pos_control to make std_1
@@ -340,7 +345,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.drop_tip()
     p300.flow_rate.aspirate = 92.86 #reset to default
     p300.flow_rate.dispense = 92.86 #reset to default
-    p300.well_bottom_clearance.aspirate = 10 #mm default
+    p300.well_bottom_clearance.aspirate = 1 #mm default
    
     # transfer std DNA into intermediate std_mixes tubes and then to plate
     for std, intTube, well in zip(std_tubes, std_mixes, std_wells):
@@ -348,19 +353,17 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.pick_up_tip()
         p20.flow_rate.aspirate = 4
         p20.flow_rate.dispense = 4
-        p20.well_bottom_clearance.aspirate = 20
-        p20.aspirate(std_DNA_xfer_to_stds_mix, std) #aspirate from std_1 into std_mix (intermediate tube) e.g. 6.42 ul
+        p20.aspirate(std_DNA_xfer_to_stds_mix, std.bottom(3)) #aspirate from std_1 into std_mix (intermediate tube) e.g. 6.42 ul
         protocol.delay(seconds=3) #equilibrate
         p20.touch_tip()
-        p20.well_bottom_clearance.dispense = 3
-        p20.dispense(std_DNA_xfer_to_stds_mix, intTube)
+        p20.dispense(std_DNA_xfer_to_stds_mix, intTube.bottom(5))
         # p20.move_to(intTube.bottom(3))
         p20.flow_rate.aspirate = 7.56
         p20.flow_rate.dispense = 7.56
         p20.mix(2, 20, intTube.bottom(3)) #ensure vol in tip in intTube and washed
         p20.blow_out()
         p300.move_to(intTube.bottom(40)) #prevent tip from crashing into tube cap
-        p300.mix(3, 50, intTube.bottom(1))
+        p300.mix(7, 50, intTube.bottom(1))
         protocol.delay(seconds=2)
         # p300.move_to(intTube.bottom(10)) #prevent air bubbles in mmix during blow out
         p300.blow_out(intTube.bottom(10))
@@ -368,8 +371,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p20.flow_rate.aspirate = 4
         p20.flow_rate.dispense = 4
         for x in range(0,3): # need int 1, 2, and 3
-            p20.well_bottom_clearance.aspirate = 1.65 #mm
-            p20.aspirate(20, intTube) 
+            p20.aspirate(20, intTube.bottom(1)) 
             protocol.delay(seconds=2) #equilibrate
             # find digits in well, G1 and G10 and puts into list
             findNums = [int(i) for i in well.split()[0] if i.isdigit()]
@@ -378,7 +380,6 @@ def run(protocol: protocol_api.ProtocolContext):
             # this finds row
             row = well.split()[0][0]
             dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
-            p20.well_bottom_clearance.dispense = 0
             p20.dispense(20, plate[dest].bottom(2))
             p20.move_to(plate[dest].bottom(5))
             p20.blow_out()
@@ -413,7 +414,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # Next, add std_5 DNA or other std
     p300.transfer(
         std_DNA_xfer_to_bpwd_mix, # ~170ul
-        std_5.bottom(20), # vol = 900 - std_DNA_xfer_to_stds_mix (~7ul) = 893ul. 
+        std_7.bottom(20), # vol = 900 - std_DNA_xfer_to_stds_mix (~7ul) = 893ul. 
         bpwd_mix.bottom(24),
         mix_after=(2, std_DNA_xfer_to_bpwd_mix),
         blow_out=True,
@@ -450,6 +451,7 @@ def run(protocol: protocol_api.ProtocolContext):
         all_R_mix, # list
         blow_out=True,
         new_tip='always',
+        touch_tip=True,
         blowout_location='destination well', 
     )
     # add water
@@ -470,19 +472,19 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.flow_rate.dispense = 92.86 #reset to default
         p300.pick_up_tip()
         # p300.move_to(tube.bottom(6))
-        p300.mix(3, 200, tube.bottom(3)) # about 230ul in tube
+        p300.mix(6, 200, tube.bottom(3)) # about 230ul in tube
         # p300.blow_out(tube.bottom(6))
         p300.flow_rate.aspirate = 30 
         p300.flow_rate.dispense = 40 
         for i in range(0,2): # split 1..12 dispensing in half
-            p300.aspirate(R_mix_rxn*2*3, tube.bottom(0)) # 18.4 *2 wells * 3 times on row
+            p300.aspirate(R_mix_rxn*2*3, tube.bottom(1)) # 18.4 *2 wells * 3 times on row
             protocol.delay(seconds=3)
             for j in range(1+6*i,6+6*i,2): #1,3,5->7,9,11; distribute to every other col
                 dest = row+str(j)
                 p300.dispense(R_mix_rxn*2, plate[dest]) # bolus for two wells
                 if j==5 or j==11:
                     # p300.move_to(plate[dest].bottom(7)) #confirm both these work. prefer blow_out()
-                    p300.blow_out(plate[dest].bottom(7))
+                    p300.blow_out(plate[dest].bottom(10))
                 p300.touch_tip()
         p300.drop_tip()
 
@@ -501,7 +503,7 @@ def run(protocol: protocol_api.ProtocolContext):
     for first_two in range(len(F_mix_primer[0:2])): 
         p20.transfer(
             F_mix_primer[first_two],
-            fwd_10uM.bottom(1.5),
+            fwd_10uM.bottom(2),
             all_fwd[first_two],
             new_tip='once', 
             blowout_location='destination well')
@@ -510,7 +512,7 @@ def run(protocol: protocol_api.ProtocolContext):
         offset = 2
         p300.transfer(
             F_mix_primer[last_four+offset],
-            fwd_10uM.bottom(1),
+            fwd_10uM.bottom(2),
             all_fwd[last_four+offset],
             new_tip='once',
             blowout_location='destination well') #! last well, misses aspiration, about 20ul remaining, about 50ul short. More in source tube.
@@ -524,7 +526,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p20.pick_up_tip()
         p300.flow_rate.aspirate = 92.86 #reset to default
         p300.flow_rate.dispense = 92.86 #reset to default
-        p300.mix(2,78, tube.bottom(F_tube_heights[0])) # mix F primer tube, 100ul in tube
+        p300.mix(4,78, tube.bottom(F_tube_heights[0])) # mix F primer tube, 100ul in tube
         p300.blow_out(tube.bottom(10))
         p300.touch_tip()
         p20.flow_rate.aspirate=4
@@ -548,14 +550,18 @@ def run(protocol: protocol_api.ProtocolContext):
             well_dest = plate_rows[y]+plate_col[2*i+1]
             p300.move_to(plate[well_pos].bottom(40)) # prevent running tip into plate
             # p300.move_to(plate[well_pos].bottom(3))
+            p300.flow_rate.aspirate = 92.86
+            p300.flow_rate.dispense = 92.86
+            p300.mix(5,20, plate[well_pos].bottom(5)) 
             p300.flow_rate.aspirate = 30
             p300.flow_rate.dispense = 30
-            p300.mix(3,20, plate[well_pos].bottom(1)) 
-            p300.aspirate(30, plate[well_pos].bottom(0))
+            p300.aspirate(30, plate[well_pos].bottom(3))
             p300.dispense(30, plate[well_pos].bottom(1)) #deposit slowly at bottom so no bubbles
+            p300.move_to(plate[well_pos].bottom(10))
+            protocol.delay(seconds=2)
             # p300.flow_rate.aspirate = 92.86 # default
             # p300.flow_rate.aspirate = 92.86 # default
-            p300.blow_out(plate[well_pos].bottom(6))
+            p300.blow_out(plate[well_pos].bottom(12))
             p20.move_to(plate[well_pos].bottom(40)) # prevent plate collision
             p20.aspirate(20, plate[well_pos].bottom(1))
             protocol.delay(seconds=2)
