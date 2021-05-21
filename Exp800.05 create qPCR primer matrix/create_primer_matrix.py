@@ -180,6 +180,10 @@ def run(protocol: protocol_api.ProtocolContext):
     std_DNA_xfer_to_stds_mix =  dna_per_rxn*std_NTC_reps*(1+percent_waste-std_NTC_waste_offset)# Calc how much DNA from each standard adding to stds_mix with waste. (in ul)
     bpw_mix_xfer_bpwd_mix =  tot_samp*BPW_rxn*(1+percent_waste-bpw_waste_offset)# Calc how much bpw_mix needed in new tube for # total samples
     std_DNA_xfer_to_bpwd_mix = dna_per_rxn*tot_samp*(1+percent_waste-bpw_waste_offset) # Calc how much DNA to add to bpw_mix for template in PCR rxns.
+    dna_per_rxn_10x = 0.2 # dna_per_rxn_10x =  # 10x concentrated DNA to add to reactions to avoid using too much std sample
+    water_per_rxn_bpwd_mix = 2-dna_per_rxn_10x# water_per_rxn_bpwd_mix =  # Water to add to bpwd mix to offset 2ul to 0.2ul DNA addition.
+    dna_XFR_bpwd_mix = tot_samp*dna_per_rxn_10x*(1+percent_waste-bpw_waste_offset) # dna_XFR_bpwd_mix =  # The amount of DNA to transfer from a std tube to the bpwd_mix
+    water_XFR_bpwd_mix = tot_samp*water_per_rxn_bpwd_mix*(1+percent_waste-bpw_waste_offset) # water_XFR_bpwd_mix =  # The amount of water to transfer to the bpwd_mix to offset lower DNA vol addition
     bpwd_rxn = BPW_rxn+dna_per_rxn  # Calc vol of bpw reaction + DNA vol
     bpwd_mix_xfer_R_mix = bpwd_rxn*R_reps*(1+percent_waste-R_mix_waste_offset) # Calc how muc bpwd_mix to transfer to each tube for specific R conc. Less than 12% to avoid missing vol.
     R_50_rxn = R_50/1000*tot_rxn_vol/orig_R_conc # Calc how much R primer at lowest concentration to add per reaction? (e.g. 50nM) (in ul)
@@ -248,42 +252,6 @@ def run(protocol: protocol_api.ProtocolContext):
    
    
     # ##### COMMANDS ######
-    # # make pos control standards
-    # # transfer from pos_control to make std_1
-    # pos_control_height = tip_heights(900,1,10)
-    # p20.transfer(
-    #     10,
-    #     pos_control.bottom(pos_control_height[0]), #1uM
-    #     std_1.bottom(20),
-    #     mix_after=(2, 20), # remove residual fluid from tip
-    #     touch_tip=True
-    # )
-    
-    # # serial dilutions in microfuge tubes, 10% diliutions
-    # p300.pick_up_tip()
-    # for i in range(len(std_wells)-2): #don't want out of range because i + 1
-    #     p300.well_bottom_clearance.aspirate = 15 #mm come up for mixing 
-    #     p300.well_bottom_clearance.dispense = 15 #mm 
-    #     last_std_tube = len(std_wells)-2 # (int) position of last std tube; last tube = water
-    #     if i==0 or i==last_std_tube: # first or last std tube; not water
-    #         p300.mix(3, 200,std_tubes[i]) # need to add mixes to first and last tubes
-    #     p300.mix(3, 200,std_tubes[i])
-    #     # p300.well_bottom_clearance.aspirate = 10 #mm 
-    #     p300.flow_rate.aspirate = 40 #slow aspirate; no air
-    #     p300.aspirate(100,std_tubes[i])
-    #     p300.touch_tip()
-    #     p300.flow_rate.dispense = 40 #slow dispense
-    #     p300.dispense(100,std_tubes[i+1])
-    #     p300.flow_rate.aspirate = 92.86 #default
-    #     p300.flow_rate.dispense = 92.86 #default
-    #     p300.mix(3, 200,std_tubes[i+1]) #remove residual inside tip
-    #     # p300.move_to(std_wells[i+1].bottom(15)) #come up for blowout
-    #     p300.blow_out()
-    #     protocol.delay(seconds=2) #wait for bubbles to subside
-    # p300.well_bottom_clearance.dispense = 1 #mm default
-    # p300.well_bottom_clearance.aspirate = 1 #mm default
-    # p300.drop_tip()
-
     # prepare sN_mix
     # add BPW_mix to sN_mix tube
     p300.pick_up_tip()
@@ -410,16 +378,20 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.blow_out(bpwd_mix.bottom(h+8)) # want to be above liquid level
         p300.touch_tip()
     p300.drop_tip()
-
-    # Next, add std_5 DNA or other std
-    p300.transfer(
-        std_DNA_xfer_to_bpwd_mix, # ~170ul
-        std_7.bottom(20), # vol = 900 - std_DNA_xfer_to_stds_mix (~7ul) = 893ul. 
+    # Second, add std_5 DNA or other std. 0.2ul added instead of 2ul to avoid using large volumes of std
+    p20.transfer(
+        dna_XFR_bpwd_mix, #16.8ul
+        std_7.bottom(2),
         bpwd_mix.bottom(24),
         mix_after=(2, std_DNA_xfer_to_bpwd_mix),
         blow_out=True,
         blowout_location='destination well')
-    # transfer bpwd_mix to intermediate R tubes (R_mix_1)
+    # Third, add water to offset the reduction in DNA vol, from 2ul to 0.2 = 1.8ul*72*(1+waste-offset)
+    p300.transfer(
+        water_XFR_bpwd_mix, # ~151.4ul
+        water.bottom(2), # vol = 900 - std_DNA_xfer_to_stds_mix (~7ul) = 893ul. 
+        bpwd_mix.bottom(24))
+    # Last, transfer bpwd_mix to intermediate R tubes (R_mix_1)
     bpwd_heights = tip_heights(bpwd_mix_tot, len(all_R_mix), bpwd_mix_xfer_R_mix)
     bpwd_heights = tip_heights(BPW_mix_tot-sN_mix_tot, len(all_R_mix), bpwd_mix_xfer_R_mix)    #[25.9, 22.9, 19.5, 15.9, 12.3, 0.5]
     p300.pick_up_tip()
