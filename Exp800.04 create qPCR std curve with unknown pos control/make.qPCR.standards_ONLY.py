@@ -12,14 +12,11 @@ metadata = {
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '4')
-    # water_rack = protocol.load_labware('opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical', '5') 
-    # tiprack300 = protocol.load_labware('opentrons_96_tiprack_300ul', '8')
+    pos_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
+    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    # tiprack20 = protocol.load_labware('opentrons_96_tiprack_20ul', '9')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
-    tempdeck = protocol.load_module('tempdeck', '10')
-    # stds_plate = tempdeck.load_labware('amplifyt_96_aluminumblock_300ul')
+    tempdeck = protocol.load_module('tempdeck', '10') # have this so I don't have to move it off
     stds_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     
     # PIPETTES
@@ -46,7 +43,8 @@ def run(protocol: protocol_api.ProtocolContext):
     std_13 = fuge_rack['C1'] # 900ul water
     std_14 = fuge_rack['C2'] # 900ul water
     std_15 = fuge_rack['C3'] # 900ul water
-    pos_control = fuge_rack['D1'] # pos control @1uM
+
+    pos_control = pos_rack['A1'] # pos control @1uM
     
     # LISTS
     std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15]
@@ -61,17 +59,13 @@ def run(protocol: protocol_api.ProtocolContext):
         pos_control.bottom(20), #1uM
         std_1.bottom(20),
         mix_after=(2, 20), # remove residual fluid from tip
-        blow_out=True,
-        touch_tip=True,
-        blowout_location='destination well'
+        touch_tip=True
     )
    
     # serial dilutions in microfuge tubes, 10% diliutions
     for i in range(len(std_wells)-1): 
         h_mix = 20
         p300.pick_up_tip()
-        # if i==0: # first tube
-            # p300.mix(5, 200, std_wells[i].bottom(h_mix)) # need to add mixes to first and last tubes
         p300.mix(2, 200, std_wells[i].bottom(8)) # mix low
         p300.mix(2, 200, std_wells[i].bottom(14)) # mix mid
         p300.mix(5, 200, std_wells[i].bottom(h_mix)) #mix hi
