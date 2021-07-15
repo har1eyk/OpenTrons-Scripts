@@ -13,3 +13,10 @@ Exp800.07 test qPCR samples (11 reps)/IAC_vs_pos_control_OT-2_moves.txt
 Exp800.05 create qPCR primer matrix/create_primer_matrix_fuel_qPCR.py
 Exp800.05 create qPCR primer matrix/create_primer_matrix_IAC_in.Lspp.py
 Exp800.05 create qPCR primer matrix/create_primer_matrix_Leg.spp_qPCR.py
+Exp800.06 create qPCR probe matrix/IAC_Lspp.background.probe_matrix.py
+Exp800.06 create qPCR probe matrix/LAB_IAC_probe_matrix.py
+Exp800.06 create qPCR probe matrix/LAB_probe_matrix.py
+Exp800.06 create qPCR probe matrix/Leg_spp_probe_matrix.py
+Exp800.07 test qPCR samples (11 reps)/IAC_vs_Pos_ctrl_conc.std.curves.py
+Exp800.07 test qPCR samples (11 reps)/IAC_vs_Pos_ctrl_conc.std.curves.py
+Exp800.07 test qPCR samples (11 reps)/IAC_vs_Pos_ctrl_conc.std.curves.py
