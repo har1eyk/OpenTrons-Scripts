@@ -99,7 +99,7 @@ def run(protocol: protocol_api.ProtocolContext):
      
     # REAGENTS
     # sds_rack
-    pos_control = stds_rack['D1'] #900ul, 1uM ssDNA
+    # pos_control = stds_rack['D1'] #900ul, 1uM ssDNA
     
     std_1 = stds_rack['A1'] # 990ul WATER
     std_2 = stds_rack['A2'] # 900ul WATER
@@ -108,14 +108,14 @@ def run(protocol: protocol_api.ProtocolContext):
     std_5 = stds_rack['A5'] # 900ul WATER
     std_6 = stds_rack['A6'] # 900ul WATER 
     std_7 = stds_rack['B1'] # 900ul WATER
-    std_8 = stds_rack['B2'] # 900ul WATER
-    std_9 = stds_rack['B3'] # 900ul WATER
-    std_10 = stds_rack['B4'] # 900ul WATER
-    std_11 = stds_rack['B5'] # 900ul WATER
-    std_12 = stds_rack['B6'] # 900ul WATER
-    std_13 = stds_rack['C1'] # 900ul WATER
-    std_14 = stds_rack['C2'] # 900ul WATER
-    std_15 = stds_rack['D2'] # 900ul WATER
+    # std_8 = stds_rack['B2'] # 900ul WATER
+    # std_9 = stds_rack['B3'] # 900ul WATER
+    # std_10 = stds_rack['B4'] # 900ul WATER
+    # std_11 = stds_rack['B5'] # 900ul WATER
+    # std_12 = stds_rack['B6'] # 900ul WATER
+    # std_13 = stds_rack['C1'] # 900ul WATER
+    # std_14 = stds_rack['C2'] # 900ul WATER
+    # std_15 = stds_rack['D2'] # 900ul WATER
 
     std_1mix = stds_rack['C3'] # empty
     std_2mix = stds_rack['C4'] # empty
@@ -145,12 +145,12 @@ def run(protocol: protocol_api.ProtocolContext):
     std_tubes = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, WATER]
     std_mixes = [std_1mix, std_2mix, std_3mix, std_4mix, std_5mix, std_6mix, std_7mix, NTC_mix]
     # legionella_stds = [pos_ctrl_std_1, pos_ctrl_std_2, pos_ctrl_std_3, pos_ctrl_std_4]
-    legionella_stds = [pos_ctrl_std_2, pos_ctrl_std_3, pos_ctrl_std_4]
+    legionella_stds = [pos_ctrl_std_1, pos_ctrl_std_2, pos_ctrl_std_3, pos_ctrl_std_4]
     std_wells_set_1 = ['A1', 'A4', 'A7', 'A10', 'B1', 'B4', 'B7', 'B10']
     std_wells_set_2 = ['C1', 'C4', 'C7', 'C10', 'D1', 'D4', 'D7', 'D10']
     std_wells_set_3 = ['E1', 'E4', 'E7', 'E10', 'F1', 'F4', 'F7', 'F10']
     std_wells_set_4 = ['G1', 'G4', 'G7', 'G10', 'H1', 'H4', 'H7', 'H10']
-    IAC_wells = [std_wells_set_2, std_wells_set_3, std_wells_set_4]
+    IAC_wells = [std_wells_set_1, std_wells_set_2, std_wells_set_3, std_wells_set_4]
     # IAC_wells = [std_wells_set_1, std_wells_set_2, std_wells_set_3, std_wells_set_4]
  
     
