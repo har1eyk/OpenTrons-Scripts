@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Create Pos Control Dilution Series for qPCR',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create a 15-tube pos control dilution series on a 24-well rack.',
-    'apiLevel': '2.10'
+    'apiLevel': '2.11'
 }
 ##########################
 def run(protocol: protocol_api.ProtocolContext):
@@ -28,7 +28,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
      
     # REAGENTS 
-    std_1 = fuge_rack['A1'] # 990ul Water
+    std_1 = fuge_rack['A1'] # 900ul Water
     std_2 = fuge_rack['A2'] # 900ul water
     std_3 = fuge_rack['A3'] # 900ul water
     std_4 = fuge_rack['A4'] # 900ul water
