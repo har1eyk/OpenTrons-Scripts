@@ -145,6 +145,7 @@ def run(protocol: protocol_api.ProtocolContext):
     mmix_XFR_std_mix = 3*18*1.14 # transfer this amount to the std mix intermediate tubes that will receive DNA
     std_dna_XFR_to_std_int=3*2*1.14	#transfer this amount DNA to std_int_tubes to mix and aliquot to 3 wells
     mmix_XFR_samp_wells = 18*12*1.1 # how much mastermix transferred as bolus to well A1, B1..F1 to receive DNA
+    samp_dna_XFR_to_wells = 2*12*1.1 # 26.4 2ul in 12 wells + excess
     
     # lists
     # the DNA from these tubes will be used to create a std curve    
@@ -250,7 +251,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # add dna to first wells, mix, and aliquot to neighbors
     # six samples, can be changed in the user inputs
-    samp_dna_XFR_to_wells = 2*12*1.1 # 26.4 2ul in 12 wells + excess
     for i, (sample, well) in enumerate(zip(samp_sources, samp_wells)):
         p300.pick_up_tip()
         p20.pick_up_tip()
