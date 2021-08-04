@@ -3,7 +3,7 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    'protocolName': 'Test qPCR Samples Using Opt Fwd and Rev and Prove Concentrations',
+    'protocolName': 'Test qPCR Samples Using Opt Fwd and Rev and Probe Concentrations',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Creates a 96w plate of optimal primer and probe concentrations to qPCR samples. Also creates a std curve.',
     'apiLevel': '2.11'
@@ -131,6 +131,7 @@ def run(protocol: protocol_api.ProtocolContext):
     MIX_master = fuge_rack['D1'] # see sheet, but ~2075
     WATER = fuge_rack['A1'] # 1500ul WATER
    
+   # user-prepared samples can be placed here.
     samp_1 = fuge_rack['B1'] # e.g. 0.625uM # empty
     samp_2 = fuge_rack['B2'] # e.g. 1.25uM # empty
     samp_3 = fuge_rack['B3'] # e.g. 2.5uM # empty
@@ -146,12 +147,17 @@ def run(protocol: protocol_api.ProtocolContext):
     mmix_XFR_samp_wells = 18*12*1.1 # how much mastermix transferred as bolus to well A1, B1..F1 to receive DNA
     
     # lists
-    # std_tubes = [std_2, std_3, std_4, std_5, std_6, std_7, std_8, WATER]
-    std_tubes = [std_3, std_4, std_5, std_6, std_7, std_8, std_9, WATER]
+    # the DNA from these tubes will be used to create a std curve    
+    std_tubes = [std_3, std_4, std_5, std_6, std_7, std_8, std_9, WATER] 
+    # this tube numbering is for OT-2. DNA is added to these tubes, mixed and aliquoted to plate
     std_mixes = [std_1mix, std_2mix, std_3mix, std_4mix, std_5mix, std_6mix, std_7mix, NTC_mix]
+    # the location of the std wells
     std_wells = ['G1', 'G4', 'G7', 'G10', 'H1', 'H4', 'H7', 'H10']
+    # the location of the std wells. Mastermix added here.
     samp_wells = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1']
+    # from which tubes should OT2 draw for 11 replicates. Can be std tubes for LOD...
     samp_sources = [std_8, std_9, std_10, std_11, std_12, std_13]
+    # or can be from user processed tubes. 
     # samp_sources = [samp_1, samp_2, samp_3, samp_4, samp_5, samp_6]
     
     
