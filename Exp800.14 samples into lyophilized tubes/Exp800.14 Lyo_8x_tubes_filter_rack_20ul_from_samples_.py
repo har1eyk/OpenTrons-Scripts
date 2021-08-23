@@ -45,13 +45,13 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # sds_rack  @ position 2
     # WATER = stds_rack['D1'] # 1500ul WATER
-    SAMP_1mix = stds_rack['C3'] # empty
-    SAMP_2mix = stds_rack['C4'] # empty
-    SAMP_3mix = stds_rack['C5'] # empty
-    SAMP_4mix = stds_rack['C6'] # empty
-    SAMP_5mix = stds_rack['D3'] # empty
-    SAMP_6mix = stds_rack['D4'] # empty
-    SAMP_7mix = stds_rack['D5'] # empty
+    SAMP_1mix = stds_rack['A3'] # empty
+    SAMP_2mix = stds_rack['A4'] # empty
+    SAMP_3mix = stds_rack['A5'] # empty
+    SAMP_4mix = stds_rack['A6'] # empty
+    SAMP_5mix = stds_rack['B1'] # empty
+    SAMP_6mix = stds_rack['B2'] # empty
+    SAMP_7mix = stds_rack['B3'] # empty
     # SAMP_1mix = stds_rack['B5'] # empty
     # SAMP_2mix = stds_rack['B6'] # empty
     # SAMP_3mix = stds_rack['C1'] # empty
@@ -59,10 +59,10 @@ def run(protocol: protocol_api.ProtocolContext):
     # SAMP_5mix = stds_rack['B5'] # empty
     # SAMP_6mix = stds_rack['B6'] # empty
     # SAMP_7mix = stds_rack['C1'] # empty
-    NTC_mix = stds_rack['D1'] # empty, receives sN_mix and WATER as NTC
+    NTC_mix = stds_rack['D6'] # empty, receives sN_mix and WATER as NTC
     
     # user inputs
-    num_of_sample_reps = 12
+    num_of_sample_reps = 6
     # is num_of_sample_reps > 12?
     holderList = [holder_1, holder_2]
     add_sample_vol = 2
