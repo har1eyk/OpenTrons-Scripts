@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Create Pos Control Dilution Series for qPCR',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create a 12-tube pos control dilution series on a 24-well rack.',
-    'apiLevel': '2.9'
+    'apiLevel': '2.11'
 }
 ##########################
 def run(protocol: protocol_api.ProtocolContext):
@@ -105,7 +105,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # p300 necessary for mixing
         p300.move_to(stds_plate[probe_wells[i]].bottom(40)) # add this so it doesn't crash into plate
         # p300.move_to(stds_plate[probe_wells[i]].bottom(1)) #above mmix solution
-        p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(3)) # can't be mixed homogenously with p20 #ivetried
+        p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(3), rate=0.5) # can't be mixed homogenously with p20 #ivetried
         p300.move_to(stds_plate[probe_wells[i]].bottom(10)) #above mmix solution
         protocol.delay(seconds=2) #outside fluid coalesce 
         p300.blow_out(stds_plate[probe_wells[i]].bottom(12))
