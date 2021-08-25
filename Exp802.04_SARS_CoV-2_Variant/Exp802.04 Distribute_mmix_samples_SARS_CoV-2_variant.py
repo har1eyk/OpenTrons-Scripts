@@ -20,7 +20,7 @@ def run(protocol: protocol_api.ProtocolContext):
     tempdeck = protocol.load_module('tempdeck', '10')
     sectempdeck = protocol.load_module('tempdeck', '4')
     plate = tempdeck.load_labware('abi_96_wellplate_250ul')
-    stds_rack = sectempdeck.load_labware('opentrons_24_aluminumblock_nest_2ml_screwcap')
+    stds_rack = sectempdeck.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap')
     
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -81,27 +81,27 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # #### COMMANDS ######    
     # Transfer BioSellal mmix to cols 1-6
-    # for col in BioMix_cols:
-    #     p20.transfer(
-    #         15,
-    #         BioMix.bottom(2),
-    #         plate.columns_by_name()[col],
-    #         blow_out=True,
-    #         blowout_location='destination well',
-    #         touch_tip=True,
-    #         new_tip='once'
-    #     )
-    # # Transfer LU mmix to cols 7-12
-    # for col in LU_Mix_cols:
-    #     p20.transfer(
-    #         15,
-    #         LU_Mix.bottom(2),
-    #         plate.columns_by_name()[col],
-    #         blow_out=True,
-    #         blowout_location='destination well',
-    #         touch_tip=True,
-    #         new_tip='once'
-    #     )
+    for col in BioMix_cols:
+        p20.transfer(
+            15,
+            BioMix.bottom(2),
+            plate.columns_by_name()[col],
+            blow_out=True,
+            blowout_location='destination well',
+            touch_tip=True,
+            new_tip='once'
+        )
+    # Transfer LU mmix to cols 7-12
+    for col in LU_Mix_cols:
+        p20.transfer(
+            15,
+            LU_Mix.bottom(2),
+            plate.columns_by_name()[col],
+            blow_out=True,
+            blowout_location='destination well',
+            touch_tip=True,
+            new_tip='once'
+        )
 
     # Add Beta samples to Mix
     for sample, pos in zip(beta, beta_wells):
@@ -145,5 +145,6 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.distribute(
         5,
         water.bottom(2),
-        [plate.wells_by_name()[well_name] for well_name in NEG_wells]
+        [plate.wells_by_name()[well_name] for well_name in NEG_wells],
+        new_tip='always' #don't want tip to go back to tube contaminating sample
     )
