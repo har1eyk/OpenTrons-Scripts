@@ -45,24 +45,24 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # sds_rack  @ position 2
     # WATER = stds_rack['D1'] # 1500ul WATER
-    SAMP_1mix = stds_rack['A3'] # empty
-    SAMP_2mix = stds_rack['A4'] # empty
-    SAMP_3mix = stds_rack['A5'] # empty
-    SAMP_4mix = stds_rack['A6'] # empty
-    SAMP_5mix = stds_rack['B1'] # empty
-    SAMP_6mix = stds_rack['B2'] # empty
-    SAMP_7mix = stds_rack['B3'] # empty
-    # SAMP_1mix = stds_rack['B5'] # empty
+    SAMP_1mix = stds_rack['B1'] # empty
+    SAMP_2mix = stds_rack['B2'] # empty
+    SAMP_3mix = stds_rack['B3'] # empty
+    SAMP_4mix = stds_rack['B4'] # empty
+    SAMP_5mix = stds_rack['B5'] # empty
+    SAMP_6mix = stds_rack['B6'] # empty
+    SAMP_7mix = stds_rack['C1'] # empty
+    SAMP_8mix = stds_rack['C2'] # empty
     # SAMP_2mix = stds_rack['B6'] # empty
     # SAMP_3mix = stds_rack['C1'] # empty
     # SAMP_4mix = stds_rack['C2'] # empty
     # SAMP_5mix = stds_rack['B5'] # empty
     # SAMP_6mix = stds_rack['B6'] # empty
     # SAMP_7mix = stds_rack['C1'] # empty
-    NTC_mix = stds_rack['D6'] # empty, receives sN_mix and WATER as NTC
+    # NTC_mix = stds_rack['D6'] # empty, receives sN_mix and WATER as NTC
     
     # user inputs
-    num_of_sample_reps = 6
+    num_of_sample_reps = 12
     # is num_of_sample_reps > 12?
     holderList = [holder_1, holder_2]
     add_sample_vol = 2
@@ -70,23 +70,23 @@ def run(protocol: protocol_api.ProtocolContext):
     add_water_vol = tot_sample_vol-add_sample_vol
     # lists
     # ALL_SAMPs = [samp_1, samp_2, samp_3, samp_4, samp_5, samp_6, samp_7, WATER]
-    SAMP_mixes = [SAMP_1mix, SAMP_2mix, SAMP_3mix, SAMP_4mix, SAMP_5mix, SAMP_6mix, SAMP_7mix, NTC_mix]
+    SAMP_mixes = [SAMP_1mix, SAMP_2mix, SAMP_3mix, SAMP_4mix, SAMP_5mix, SAMP_6mix, SAMP_7mix, SAMP_8mix]
     SAMP_wells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     
     # #### COMMANDS ######    
     # Add sample DNA, mix, distribute to strip tubes
     for i, mixtube in enumerate(SAMP_mixes):
         p20.pick_up_tip()
-        p300.pick_up_tip()
-        p300.move_to(mixtube.bottom(40)) #prevent tip from crashing into tube cap
-        mix_vol = 0.70*num_of_sample_reps*tot_sample_vol*1.2 # mix 70% of total vol
-        if mix_vol < 200:
-            mix_vol = 0.70*num_of_sample_reps*tot_sample_vol*1.2 # mix 70% of total vol
-        else:
-            mix_vol = 200
-        p300.mix(7, mix_vol, mixtube.bottom(2))
-        protocol.delay(seconds=2)
-        p300.blow_out(mixtube.bottom(10))
+        # p300.pick_up_tip()
+        # p300.move_to(mixtube.bottom(40)) #prevent tip from crashing into tube cap
+        # mix_vol = 0.70*num_of_sample_reps*tot_sample_vol*1.2 # mix 70% of total vol
+        # if mix_vol < 200:
+            # mix_vol = 0.70*num_of_sample_reps*tot_sample_vol*1.2 # mix 70% of total vol
+        # else:
+            # mix_vol = 200
+        # p300.mix(7, mix_vol, mixtube.bottom(2))
+        # protocol.delay(seconds=2)
+        # p300.blow_out(mixtube.bottom(10))
         p20.move_to(mixtube.bottom(40))
         # num_of_sample_reps is another way of stating number of strips
         for y in range(0, len(holderList)):
@@ -97,7 +97,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for x in range(start, stop): # samples in 1-6, 7-12, 13-18 increments
                 print ("start: ", start, "stop: ", stop)
                 p20.aspirate(20, mixtube, rate=0.75) 
-                protocol.delay(seconds=2) #equilibrate
+                protocol.delay(seconds=1) #equilibrate
                 row = SAMP_wells[i]
                 dest = row+str(2*x+1-12*holderPos) # need +1 offset for col 
                 # dest = row+str(2*x+1-12*holderPos) # need +1 offset for col 
@@ -113,5 +113,5 @@ def run(protocol: protocol_api.ProtocolContext):
                 p20.touch_tip()
                 p20.move_to(holder[dest].bottom(40)) #move back holder in +4cm pos
                 p20.move_to(mixtube.bottom(40)) #return to tube at +4cm so no crash into lyo tubes
-        p300.drop_tip()
+        # p300.drop_tip()
         p20.drop_tip()
