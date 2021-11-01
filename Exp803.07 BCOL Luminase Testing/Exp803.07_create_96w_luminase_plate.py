@@ -85,21 +85,6 @@ def fifty_ml_heights(init_vol, steps, vol_dec):
             heights.append(round(h, 1))
     return heights
 
-# splits aspiration volume into equal parts 
-def split_asp(tot, max_vol):
-    n =1
-    if tot/n > max_vol: # if total greater than max
-       while tot/n > max_vol: # increment n until some tot/n < max_vol
-            n+=1
-            if tot/n == max_vol: # if tot evently divided e.g. 1000
-                subvol = tot/n
-                return [subvol]*n
-            if tot/(n+1) < max_vol: # if tot <> evenly divided e.g. 417.3
-                subvol = tot/(n+1)
-                return [subvol]*(n+1) # return # aspiration steps
-    else: # if total less than max
-        return [tot/n]
-
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
@@ -108,7 +93,7 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10') # leaving on so I don't have to move off 
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '3')
-    reagent_rack = protocol.load_labware('opentrons_6_tuberack_nest_50ml_conical', '2')
+    reagent_rack = protocol.load_labware('opentrons_6_tuberack_nest_50ml_conical', '6')
 
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -126,7 +111,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #epp_rack
     dATP = epp_rack['A1'] # ATP Should be at 0.1mM or 100uM; 1584ul
     dLuciferin = epp_rack['B1'] # Luciferin, 10mM stock? 1584ul   
-    trash = epp_rack['C1'] # trash; receives some of the blowouts 
+    trash = epp_rack['D6'] # trash; receives some of the blowouts 
     
     
     # lists
@@ -148,8 +133,8 @@ def run(protocol: protocol_api.ProtocolContext):
             dest = row+str(j+1)
             p300.aspirate(sample_vol, water.bottom(sample_h[sample_counter]))
             p300.dispense(sample_vol, plate[dest].bottom(5))
-            p300.blow_out(plate[dest].bottom(7)) 
-            p300.touch_tip()
+            # p300.blow_out(plate[dest].bottom(7)) 
+            # p300.touch_tip()
             sample_counter += 1
     p300.drop_tip()
     # last two columns need p20
@@ -175,7 +160,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.aspirate(dLuciferin_vol*12+luciferin_bolus, dLuciferin.bottom(luciferin_h[luciferin_counter])) #5ul bolus
         for j in range(12): # all cols
             dest = row+str(j+1)
-            p300.dispense(dLuciferin_vol, plate[dest].bottom(2))
+            p300.dispense(dLuciferin_vol, plate[dest].bottom(1))
         luciferin_counter += 1
         p300.dispense(luciferin_bolus, trash.top(-4)) # remove bolus
         p300.blow_out(trash.top(-4))
