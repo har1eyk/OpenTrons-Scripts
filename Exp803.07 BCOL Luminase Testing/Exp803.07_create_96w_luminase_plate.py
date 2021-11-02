@@ -70,15 +70,15 @@ def fifty_ml_heights(init_vol, steps, vol_dec):
     b = 0
     m = 0.0024
     if init_vol > 51000:
-        offset = 14  # model out of range; see sheet
+        offset = 10  # model out of range; see sheet
     else:
-        offset = 15  # mm Need to add offset to ensure tip reaches below liquid level
+        offset = 5  # mm Need to add offset to ensure tip reaches below liquid level
     for i in range(steps):
         x = init_vol-vol_dec*i
         vols.append(x)
         h = m*x+b
         h = h-offset
-        if h < 17.5:  # If less than 5mL remain in 50mL tube, go to bottom for asp
+        if h < 12:  # If less than 5mL remain in 50mL tube, go to bottom for asp
             h = 2
             heights.append(h)
         else:
@@ -88,7 +88,7 @@ def fifty_ml_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    epp_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', '1')
+    epp_rack = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', '5')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10') # leaving on so I don't have to move off 
@@ -122,7 +122,7 @@ def run(protocol: protocol_api.ProtocolContext):
     dLuciferin_vol = 15
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-    ##### COMMANDS ######
+    #### COMMANDS ######
 # Add sample (water)
     p300.pick_up_tip()
     sample_h = fifty_ml_heights(9338.89, 96, 82.50) # volumes are different, so take median
@@ -133,8 +133,9 @@ def run(protocol: protocol_api.ProtocolContext):
             dest = row+str(j+1)
             p300.aspirate(sample_vol, water.bottom(sample_h[sample_counter]))
             p300.dispense(sample_vol, plate[dest].bottom(5))
-            # p300.blow_out(plate[dest].bottom(7)) 
-            # p300.touch_tip()
+            p300.blow_out(plate[dest].bottom(5)) 
+            p300.touch_tip()
+            p300.move_to(plate[dest].top()) # move to center to avoid tip flicking
             sample_counter += 1
     p300.drop_tip()
     # last two columns need p20
@@ -148,6 +149,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.dispense(sample_vol, plate[dest].bottom(5))
             p20.blow_out(plate[dest].bottom(7)) 
             p20.touch_tip()
+            p20.move_to(plate[dest].top())
             sample_counter += 1
     p20.drop_tip()
 
@@ -160,7 +162,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.aspirate(dLuciferin_vol*12+luciferin_bolus, dLuciferin.bottom(luciferin_h[luciferin_counter])) #5ul bolus
         for j in range(12): # all cols
             dest = row+str(j+1)
-            p300.dispense(dLuciferin_vol, plate[dest].bottom(1))
+            p300.dispense(dLuciferin_vol, plate[dest].bottom(0.5))
         luciferin_counter += 1
         p300.dispense(luciferin_bolus, trash.top(-4)) # remove bolus
         p300.blow_out(trash.top(-4))
@@ -177,9 +179,11 @@ def run(protocol: protocol_api.ProtocolContext):
         for row in rows: # process 8 rows 
             dest = row+str(j+1)
             p20.aspirate(deterg_vol, detergent.bottom(deterg_h[deterg_counter]))
+            p20.touch_tip(v_offset=-5)
+            p20.move_to(detergent.top()) # prevent tip flicking and vol distortion
             p20.dispense(deterg_vol, plate[dest].bottom(5))
             p20.blow_out(plate[dest].bottom(7)) 
-            p20.touch_tip()
+            p20.move_to(plate[dest].bottom(1)) # remove droplets instead of tip_touch
             deterg_counter += 1
     p20.drop_tip()
     # Last 9 cols need p300
@@ -190,9 +194,11 @@ def run(protocol: protocol_api.ProtocolContext):
         for row in rows: # process 8 rows 
             dest = row+str(j+1)
             p300.aspirate(deterg_vol, detergent.bottom(deterg_h[deterg_counter]))
+            p300.touch_tip(v_offset=-5)
+            p300.move_to(detergent.top()) #prevent tip flicking
             p300.dispense(deterg_vol, plate[dest].bottom(5))
             p300.blow_out(plate[dest].bottom(7)) 
-            p300.touch_tip()
+            p300.move_to(plate[dest].bottom(1)) # remove droplets instead of tip_touch
             deterg_counter += 1
     p300.drop_tip()
     
@@ -204,9 +210,13 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(12): # all cols
             dest = row+str(j+1)
             p300.aspirate(luminaseBuffer_vol, luminaseBuffer.bottom(buffer_h[buffer_counter]))
-            p300.dispense(luminaseBuffer_vol, plate[dest].bottom(4))
+            p300.touch_tip(v_offset=-10) # remove droplets from buffer
+            p300.move_to(luminaseBuffer.top())
+            p300.dispense(luminaseBuffer_vol, plate[dest].bottom(5))
             buffer_counter += 1
     p300.drop_tip()
+
+    protocol.pause('All reagents added but ATP for background calculations. Resume to add ATP.')
 
 # Add ATP to initiate reaction
     p300.pick_up_tip()
