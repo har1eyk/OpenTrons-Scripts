@@ -134,8 +134,9 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.aspirate(sample_vol, water.bottom(sample_h[sample_counter]))
             p300.dispense(sample_vol, plate[dest].bottom(5))
             p300.blow_out(plate[dest].bottom(5)) 
-            p300.touch_tip()
-            p300.move_to(plate[dest].top()) # move to center to avoid tip flicking
+            p300.move_to(plate[dest].bottom())
+            # p300.touch_tip()
+            # p300.move_to(plate[dest].top()) # move to center to avoid tip flicking
             sample_counter += 1
     p300.drop_tip()
     # last two columns need p20
@@ -148,8 +149,9 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.aspirate(sample_vol, water.bottom(sample_h[sample_counter]))
             p20.dispense(sample_vol, plate[dest].bottom(5))
             p20.blow_out(plate[dest].bottom(7)) 
-            p20.touch_tip()
-            p20.move_to(plate[dest].top())
+            p20.move_to(plate[dest].bottom())
+            # p20.touch_tip()
+            # p20.move_to(plate[dest].top())
             sample_counter += 1
     p20.drop_tip()
 
@@ -183,7 +185,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.move_to(detergent.top()) # prevent tip flicking and vol distortion
             p20.dispense(deterg_vol, plate[dest].bottom(5))
             p20.blow_out(plate[dest].bottom(7)) 
-            p20.move_to(plate[dest].bottom(1)) # remove droplets instead of tip_touch
+            p20.move_to(plate[dest].bottom()) # remove droplets instead of tip_touch
             deterg_counter += 1
     p20.drop_tip()
     # Last 9 cols need p300
@@ -198,7 +200,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.move_to(detergent.top()) #prevent tip flicking
             p300.dispense(deterg_vol, plate[dest].bottom(5))
             p300.blow_out(plate[dest].bottom(7)) 
-            p300.move_to(plate[dest].bottom(1)) # remove droplets instead of tip_touch
+            p300.move_to(plate[dest].bottom()) # remove droplets instead of tip_touch
             deterg_counter += 1
     p300.drop_tip()
     
@@ -210,9 +212,10 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(12): # all cols
             dest = row+str(j+1)
             p300.aspirate(luminaseBuffer_vol, luminaseBuffer.bottom(buffer_h[buffer_counter]))
-            p300.touch_tip(v_offset=-10) # remove droplets from buffer
+            p300.touch_tip(v_offset=-8) # remove droplets from buffer
             p300.move_to(luminaseBuffer.top())
             p300.dispense(luminaseBuffer_vol, plate[dest].bottom(5))
+            p300.move_to(plate[dest].bottom())
             buffer_counter += 1
     p300.drop_tip()
 
