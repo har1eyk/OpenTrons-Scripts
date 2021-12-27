@@ -51,7 +51,7 @@ def run(protocol: protocol_api.ProtocolContext):
     std_11_5 = fuge_rack['D5'] # no water; empty tube
 
     pos_control = pos_rack['A1'] # 100-1000ul pos control @1uM
-    water = pos_rack['D6'] # 100-1000ul pos control @1uM
+    water = pos_rack['D6'] # 1700ul water
     
     # LISTS
     std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15]
@@ -91,22 +91,22 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     for lod_tube in lod_wells:
         for j in range(2):
-            p300.aspirate(150, water)
+            p300.aspirate(150, water.bottom(2))
             protocol.delay(seconds =2)
             p300.touch_tip(v_offset = -3)
-            p300.dispense(150, lod_tube)
-            p300.blow_out()
+            p300.dispense(150, lod_tube.bottom(10))
+            p300.blow_out(lod_tube.bottom(15))
             p300.touch_tip()
     p300.drop_tip()
     
     # transfer 300ul from std_11 to std_11_1 to begin dilution series
     p300.pick_up_tip()
     for j in range(2):
-        p300.aspirate(150, std_11, rate=0.8)
+        p300.aspirate(150, std_11.bottom(8), rate=0.8)
         protocol.delay(seconds =2)
         p300.touch_tip(v_offset = -3)
-        p300.dispense(150, std_11_1)
-        p300.blow_out()
+        p300.dispense(150, std_11_1.bottom(8))
+        p300.blow_out(std_11_1.bottom(15))
         p300.touch_tip()
     p300.drop_tip()
     
@@ -117,8 +117,8 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.mix(2, 200, lod_wells[i].bottom(5)) # mix low
         p300.mix(2, 200, lod_wells[i].bottom(10)) # mix mid
         p300.mix(5, 200, lod_wells[i].bottom(h_mix)) #mix hi
-        for z in range(2) # 2*150 = 300
-            p300.aspirate(150, lod_wells[i].bottom(h_mix), rate=0.8)
+        for z in range(2): # 2*150 = 300
+            p300.aspirate(150, lod_wells[i].bottom(8), rate=0.8)
             p300.touch_tip()
             p300.dispense(150, lod_wells[i+1].bottom(5)) # better mixing with mid dispense
             p300.blow_out(lod_wells[i+1].bottom(h_mix))# blow out just below the surface
