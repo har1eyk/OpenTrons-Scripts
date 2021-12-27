@@ -292,64 +292,64 @@ def run(protocol: protocol_api.ProtocolContext):
         mix_after=(2, 20),
         blowout_location='destination well')
     
-    # transfer sN_mix to intermediate tubes (std_mixes)
-    std_mix_heights = tip_heights(sN_mix_tot, len(std_mixes), sN_mix_xfer_to_stds_mix)#[13,11,8,6,4,2,0]
-    p300.pick_up_tip()
-    # need to mix F, R and water
-    p300.mix(2, 200, sN_mix.bottom(4)) #4mm from bottom; this algo better for mixing
-    p300.mix(2, 200, sN_mix.bottom(8)) #8mm from bottom
-    p300.mix(5, 200, sN_mix.bottom(std_mix_heights[0])) #10mm from bottom
-    p300.well_bottom_clearance.aspirate = std_mix_heights[0] #mm 
-    for tube, h in zip(std_mixes, std_mix_heights):
-        # p300.well_bottom_clearance.aspirate = h #mm
-        p300.aspirate(sN_mix_xfer_to_stds_mix, sN_mix.bottom(h), rate=0.4) # 18 * 3 * 1.12-0.05= 54 + 6 =60ul
-        protocol.delay(seconds=2) #tip equilibrate
-        p300.move_to(sN_mix.bottom(35)) # excess tip fluid condense 
-        protocol.delay(seconds=3) #tip droplets slide
-        p300.touch_tip()
-        p300.dispense(sN_mix_xfer_to_stds_mix, tube, rate=0.5)
-    p300.drop_tip()
-    # p300.flow_rate.aspirate = 92.86 #reset to default
-    # p300.flow_rate.dispense = 92.86 #reset to default
-    # p300.well_bottom_clearance.aspirate = 1 #mm default
+    # # transfer sN_mix to intermediate tubes (std_mixes)
+    # std_mix_heights = tip_heights(sN_mix_tot, len(std_mixes), sN_mix_xfer_to_stds_mix)#[13,11,8,6,4,2,0]
+    # p300.pick_up_tip()
+    # # need to mix F, R and water
+    # p300.mix(2, 200, sN_mix.bottom(4)) #4mm from bottom; this algo better for mixing
+    # p300.mix(2, 200, sN_mix.bottom(8)) #8mm from bottom
+    # p300.mix(5, 200, sN_mix.bottom(std_mix_heights[0])) #10mm from bottom
+    # p300.well_bottom_clearance.aspirate = std_mix_heights[0] #mm 
+    # for tube, h in zip(std_mixes, std_mix_heights):
+    #     # p300.well_bottom_clearance.aspirate = h #mm
+    #     p300.aspirate(sN_mix_xfer_to_stds_mix, sN_mix.bottom(h), rate=0.4) # 18 * 3 * 1.12-0.05= 54 + 6 =60ul
+    #     protocol.delay(seconds=2) #tip equilibrate
+    #     p300.move_to(sN_mix.bottom(35)) # excess tip fluid condense 
+    #     protocol.delay(seconds=3) #tip droplets slide
+    #     p300.touch_tip()
+    #     p300.dispense(sN_mix_xfer_to_stds_mix, tube, rate=0.5)
+    # p300.drop_tip()
+    # # p300.flow_rate.aspirate = 92.86 #reset to default
+    # # p300.flow_rate.dispense = 92.86 #reset to default
+    # # p300.well_bottom_clearance.aspirate = 1 #mm default
    
-    # transfer std DNA into intermediate std_mixes tubes and then to plate
-    for std, intTube, well in zip(std_tubes, std_mixes, std_wells):
-        p20.pick_up_tip()
-        p300.pick_up_tip()
-        # p20.flow_rate.aspirate = 4
-        # p20.flow_rate.dispense = 4
-        p20.aspirate(std_DNA_xfer_to_stds_mix, std.bottom(3), rate=0.4) #aspirate from std_1 into std_mix (intermediate tube) e.g. 6.42 ul
-        protocol.delay(seconds=3) #equilibrate
-        p20.touch_tip()
-        p20.dispense(std_DNA_xfer_to_stds_mix, intTube.bottom(2), rate=0.5)
-        # p20.move_to(intTube.bottom(3))
-        # p20.flow_rate.aspirate = 7.56
-        # p20.flow_rate.dispense = 7.56
-        p20.mix(2, 20, intTube.bottom(5)) #ensure vol in tip in intTube and washed
-        p20.blow_out()
-        p300.move_to(intTube.bottom(40)) #prevent tip from crashing into tube cap
-        p300.mix(7, 50, intTube.bottom(1))
-        protocol.delay(seconds=2)
-        # p300.move_to(intTube.bottom(10)) #prevent air bubbles in mmix during blow out
-        p300.blow_out(intTube.bottom(10))
-        p20.move_to(intTube.bottom(40))
-        for x in range(0,3): # need int 1, 2, and 3
-            p20.aspirate(20, intTube.bottom(1), rate=0.5) 
-            protocol.delay(seconds=2) #equilibrate
-            # find digits in well, G1 and G10 and puts into list
-            findNums = [int(i) for i in well.split()[0] if i.isdigit()]
-            # joins nums from list [1, 0] -> 10 type = string
-            colNum = ''.join(map(str, findNums))
-            # this finds row
-            row = well.split()[0][0]
-            dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
-            p20.dispense(20, plate[dest].bottom(2), rate=0.85)
-            p20.move_to(plate[dest].bottom(5))
-            p20.blow_out()
-            # p20.touch_tip()
-        p300.drop_tip()
-        p20.drop_tip()
+    # # transfer std DNA into intermediate std_mixes tubes and then to plate
+    # for std, intTube, well in zip(std_tubes, std_mixes, std_wells):
+    #     p20.pick_up_tip()
+    #     p300.pick_up_tip()
+    #     # p20.flow_rate.aspirate = 4
+    #     # p20.flow_rate.dispense = 4
+    #     p20.aspirate(std_DNA_xfer_to_stds_mix, std.bottom(3), rate=0.4) #aspirate from std_1 into std_mix (intermediate tube) e.g. 6.42 ul
+    #     protocol.delay(seconds=3) #equilibrate
+    #     p20.touch_tip()
+    #     p20.dispense(std_DNA_xfer_to_stds_mix, intTube.bottom(2), rate=0.5)
+    #     # p20.move_to(intTube.bottom(3))
+    #     # p20.flow_rate.aspirate = 7.56
+    #     # p20.flow_rate.dispense = 7.56
+    #     p20.mix(2, 20, intTube.bottom(5)) #ensure vol in tip in intTube and washed
+    #     p20.blow_out()
+    #     p300.move_to(intTube.bottom(40)) #prevent tip from crashing into tube cap
+    #     p300.mix(7, 50, intTube.bottom(1))
+    #     protocol.delay(seconds=2)
+    #     # p300.move_to(intTube.bottom(10)) #prevent air bubbles in mmix during blow out
+    #     p300.blow_out(intTube.bottom(10))
+    #     p20.move_to(intTube.bottom(40))
+    #     for x in range(0,3): # need int 1, 2, and 3
+    #         p20.aspirate(20, intTube.bottom(1), rate=0.5) 
+    #         protocol.delay(seconds=2) #equilibrate
+    #         # find digits in well, G1 and G10 and puts into list
+    #         findNums = [int(i) for i in well.split()[0] if i.isdigit()]
+    #         # joins nums from list [1, 0] -> 10 type = string
+    #         colNum = ''.join(map(str, findNums))
+    #         # this finds row
+    #         row = well.split()[0][0]
+    #         dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
+    #         p20.dispense(20, plate[dest].bottom(2), rate=0.85)
+    #         p20.move_to(plate[dest].bottom(5))
+    #         p20.blow_out()
+    #         # p20.touch_tip()
+    #     p300.drop_tip()
+    #     p20.drop_tip()
 
     # create bpwd_mix 
     # First, add bpw_mix to a new tube
