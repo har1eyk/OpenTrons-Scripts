@@ -65,14 +65,14 @@ def run(protocol: protocol_api.ProtocolContext):
     std_8 = fuge_rack['B2']
     std_9 = fuge_rack['B3']
     std_10 = fuge_rack['B4']
-    std_15 = fuge_rack['C3']
     std_11 = fuge_rack['B5']
     std_12 = fuge_rack['B6']
     std_13 = fuge_rack['C1']
     std_14 = fuge_rack['C2']
+    std_15 = fuge_rack['C3']
     # pos_control = fuge_rack['D1'] # pos control @1uM
-    mmix = fuge_rack['D6'] # 1332ul
     water = fuge_rack['D5'] # 1500ul water
+    mmix = fuge_rack['D6'] # 1332ul
     
     # CALCS
     mix_per_well = 15 #how much volume (ul) mastermix should be in each well?
