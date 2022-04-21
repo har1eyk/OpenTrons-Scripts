@@ -53,8 +53,8 @@ def run(protocol: protocol_api.ProtocolContext):
     water = fuge_rack['A3'] # 100 uL water
 
     # LISTS
-    std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15]
-    std_conc = [std_5, std_6, std_7, std_8, std_9,]
+    std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10]
+    std_conc = [std_6, std_7, std_8, std_9, std_10]
     cols = [1, 3, 5, 7, 9, 11]
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     
@@ -91,6 +91,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.blow_out(std_wells[i+1].bottom(h_mix))# blow out just below the surface
     p300.drop_tip()
 
+    #add first 4 standards to top half of tubes
     count = 0 # keep track of standard 
     for row in rows:
         p300.pick_up_tip()
