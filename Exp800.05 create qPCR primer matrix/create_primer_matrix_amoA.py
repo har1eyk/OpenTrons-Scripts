@@ -36,7 +36,32 @@ def tip_heights(init_vol, steps, vol_dec):
         else:
             heights.append(round(h, 1))
     return heights
-
+# Calc heights for 2mL Eppendorf tubes
+def tip_heightsEpp(init_vol, steps, vol_dec):
+    vols = []
+    heights = []
+    # these values originate from Excel spreadsheet "Exp803..."
+    p0=-0.272820744
+    p1=0.019767959
+    p2=2.00442E-06
+    p3=-8.99691E-09
+    p4=6.72776E-12
+    p5=-1.55428E-15
+    if init_vol > 2000:
+        offset = 12 # model out of range; see sheet
+    else:
+        offset = 11 #mm Need to add offset to ensure tip reaches below liquid level
+    for i in range(steps):
+        x = init_vol-vol_dec*i
+        vols.append(x)
+        h = p5*x**5+p4*x**4+p3*x**3+p2*x**2+p1*x**1 + p0
+        h = h-offset
+        if h < 6: # prevent negative heights; go to bottom to avoid air aspirant above certain height
+            h = 1        
+            heights.append(h)
+        else:
+            heights.append(round(h, 1))
+    return heights
 # splits aspiration volume into equal parts 
 def split_asp(tot, max_vol):
     n =1
@@ -56,8 +81,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
-    stds_mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '3') # this is where standards are mixed
     stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
+    stds_mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '3') # this is where standards are mixed
+    mmix_rack = protocol.load_labware('eppendorf_24_tuberack_2000ul', '4') # need more mmix, moving to a 2mL tube
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
@@ -73,7 +99,10 @@ def run(protocol: protocol_api.ProtocolContext):
     )
      
     # REAGENTS
+    # mix_rack
+    mmix = 
     # sds_rack 
+    BPW_mix = fuge_rack['A1'] # 14.8*96(1+0.3)=1847.04
     # keep this rack separate as to avoid contamination
     std_1 = stds_rack['A3'] # 990ul Water and ssDNA standard
     std_2 = stds_rack['A4'] # 900ul water and ssDNA standard
@@ -97,7 +126,6 @@ def run(protocol: protocol_api.ProtocolContext):
     bpwd_mix = fuge_rack['A1'] #empty
     liquid_trash = fuge_rack['B1']
     water = fuge_rack['B2'] # 1500ul water want to separate this from pos stds
-    BPW_mix = fuge_rack['D1'] # see sheet, but gen around 1705 ul; use 1.5mL tube
     fwd_10uM = fuge_rack['C2'] # min 300ul
     rev_10uM = fuge_rack['D2'] # min 300ul
     fwd_1 = fuge_rack['A4'] # e.g. 0.625uM # empty
@@ -288,7 +316,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # prepare sN_mix
     # add BPW_mix to sN_mix tube
     p300.pick_up_tip()
-    bpw_heights = tip_heights(BPW_mix_tot, len(split_asp(BWP_mix_xfer_sN_mix, p300_max_vol)), split_asp(BWP_mix_xfer_sN_mix, p300_max_vol)[0])
+    bpw_heights = tip_heightsEpp(BPW_mix_tot, len(split_asp(BWP_mix_xfer_sN_mix, p300_max_vol)), split_asp(BWP_mix_xfer_sN_mix, p300_max_vol)[0])
     print("bpw_heights", bpw_heights)
     p300.mix(3, 200, BPW_mix.bottom(bpw_heights[0]))
     for j in range(len(split_asp(BWP_mix_xfer_sN_mix, p300_max_vol))):
@@ -379,7 +407,7 @@ def run(protocol: protocol_api.ProtocolContext):
     #  First, add bpw_mix to a new tube
     p300.pick_up_tip()
     #  tip_heights is a function using total_vol, # steps, and aliquot (vol decrement) amt as parameters.
-    bpwd_xfer_h = tip_heights(BPW_mix_tot-BWP_mix_xfer_sN_mix, len(split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)), split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)[0])
+    bpwd_xfer_h = tip_heightsEpp(BPW_mix_tot-BWP_mix_xfer_sN_mix, len(split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)), split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)[0])
     p300.mix(3, 200, BPW_mix.bottom(bpwd_xfer_h[0]))
     for j in range(len(split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol))): # split_asp is a function that returns equally divided aspirations
         amt = split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)[j]
