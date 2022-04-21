@@ -50,7 +50,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # user inputs
     # this is 4 reps on each tube e.g. 16*4 = 64 samples
-    num_of_sample_reps = 3 # doesn't yet accommodate other ints
+    num_of_sample_reps = 6 # doesn't yet accommodate other ints
     holderList = [holder_1, holder_2]
     tot_sample_vol = 20
     # lists
