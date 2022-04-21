@@ -140,6 +140,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 dest = row+str(col)
                 p300.aspirate(water_for_mag_bead_dil_per_well/2, nfw.bottom(water_h[water_counter]))
                 p300.dispense(water_for_mag_bead_dil_per_well/2, plate[dest].bottom(25))
+                p300.blow_out(plate[dest].bottom(25))
                 p300.aspirate(water_for_mag_bead_dil_per_well/2, nfw.bottom(water_h[water_counter]))
                 p300.dispense(water_for_mag_bead_dil_per_well/2, plate[dest].bottom(25))
                 p300.blow_out(plate[dest].bottom(25))
@@ -159,8 +160,8 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.aspirate(wash_one_sol_per_well/5, wash_sol_one.bottom(wash_one_h[wash_one_counter]))
                     p300.dispense(wash_one_sol_per_well/5, plate[dest].bottom(25))
                     p300.blow_out(plate[dest].bottom(25))
-                    p300.touch_tip()
                     wash_one_counter +=1
+                p300.touch_tip()
     p300.drop_tip()  
 
     # wash buffer 2 
@@ -175,8 +176,8 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.aspirate(wash_two_sol_per_well/5, wash_sol_two.bottom(wash_two_h[wash_two_counter]), rate=0.75) #slower due to ethanol
                     p300.dispense(wash_two_sol_per_well/5, plate[dest].bottom(25))
                     p300.blow_out(plate[dest].bottom(25))
-                    p300.touch_tip()
                     wash_two_counter +=1
+                p300.touch_tip()
     p300.drop_tip()  
     
     # wash buffer 3
@@ -191,8 +192,8 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.aspirate(wash_three_etoh_per_well/5, wash_sol_three_etoh.bottom(wash_three_h[wash_three_counter]), rate=0.65) #slower due to ethanol
                     p300.dispense(wash_three_etoh_per_well/5, plate[dest].bottom(25))
                     p300.blow_out(plate[dest].bottom(25))
-                    p300.touch_tip()
                     wash_three_counter +=1
+                p300.touch_tip()
     p300.drop_tip()  
 
 # lysis buffer

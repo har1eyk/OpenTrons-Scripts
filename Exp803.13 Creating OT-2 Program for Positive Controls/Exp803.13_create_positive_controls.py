@@ -63,17 +63,17 @@ def fifteen_ml_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    rack_1 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '1')
-    rack_2 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '2')
-    # rack_3 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '3')
-    # rack_4 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '4')
-    # rack_5 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '5')
-    # rack_6 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '6')
-    # rack_7 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '7')
-    # rack_8 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '8')
-    # rack_9 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '9')
-    pos_control_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '10',)
-    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '11')
+    rack_1 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '10')
+    rack_2 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '11')
+    rack_3 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '3')
+    rack_4 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '4')
+    rack_5 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '5')
+    rack_6 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '6')
+    rack_7 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '7')
+    rack_8 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '8')
+    rack_9 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '9')
+    pos_control_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '1',)
+    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '2')
 
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -81,22 +81,24 @@ def run(protocol: protocol_api.ProtocolContext):
     )
      
     # REAGENTS
-    # pos_control = pos_control_rack['C2'] #15mL tube
-    pos_control = pos_control_rack['B4'] #50mL tube
+    pos_control = pos_control_rack['A1'] #15mL tube
+    # pos_control = pos_control_rack['B4'] #50mL tube
 
     # user inputs
     pos_control_vol = 20 #ul
-    pos_control_begin_vol = 24000 # what is the beginning vol of the pos control?
-    num_of_rounds = 3 # how many times should a full deck be processed? 9*24 = 216 tubes/round?
-    # all_racks = [rack_1, rack_2, rack_3, rack_4, rack_5, rack_6, rack_7, rack_8, rack_9]
-    all_racks = [rack_1, rack_2]
+    pos_control_begin_vol = 4000 # what is the beginning vol of the pos control?
+    num_of_rounds = 1 # how many times should a full deck be processed? 9*24 = 216 tubes/round?
+    #all_racks = [rack_1, rack_2, rack_3, rack_4, rack_5]
+    all_racks = [rack_1, rack_2, rack_3, rack_4, rack_5, rack_6, rack_7, rack_8, rack_9]
+    # all_racks = [rack_1, rack_2]
     rack_rows = ['A', 'B', 'C', 'D']
     rack_cols = ['1', '2', '3', '4', '5', '6']
 
     # ##### COMMANDS ######
     # distribute positive controls to tubes on racks
     h=0
-    height = fifty_ml_heights(pos_control_begin_vol, 3*len(all_racks)*num_of_rounds, 160) #3 aspirants per rack; 9 racks; # rounds
+    # height = fifty_ml_heights(pos_control_begin_vol, 3*len(all_racks)*num_of_rounds, 160) #3 aspirants per rack; 9 racks; # rounds
+    height = fifteen_ml_heights(pos_control_begin_vol, 3*len(all_racks)*num_of_rounds, 160) #3 aspirants per rack; 9 racks; # rounds
     print (height)
     for r in range(1, num_of_rounds+1):
         p300.pick_up_tip()
@@ -107,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 if i == 0 or i==2 or i==4: # refill every 8
                     print ("height is: ", h)
                     p300.aspirate(pos_control_vol*8, pos_control.bottom(height[h]))
-                    p300.move_to(pos_control.bottom(height[h]+10))
+                    p300.move_to(pos_control.bottom(height[h]+20))
                     protocol.delay(seconds=2)
                     p300.move_to(pos_control.bottom(height[h])) # touch tip in solution
                     h+=1
@@ -116,10 +118,10 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.dispense(pos_control_vol, dest.bottom(2))  # dispense to each well
         p300.drop_tip()
         if r == num_of_rounds:
-            protocol.pause('Round {0} is complete. That was the last round!'.format(r))
+            protocol.pause(msg='Round {0} is complete. That was the last round!'.format(r))
             # print ("Round {0} is complete. That was the last round!".format(r))
         else:
-            protocol.pause('Round {0} is complete. Clear and resume to begin round {1}.'.format(r, r+1))
+            protocol.pause(msg='Round {0} is complete. Clear and resume to begin round {1}.'.format(r, r+1))
             # print ("Round {0} is complete. Clear and resume to begin round {1}!".format(r, r+1))
 
 

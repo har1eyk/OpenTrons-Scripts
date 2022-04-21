@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Distribute Mmix and Wastewater Samples from a Single Plate to 96wells.',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Aliquoting SARS-CoV-2 mix to plate and then adding 5ul sample extraction from one DeepWell plate.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 
 ##########################
@@ -46,7 +46,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pcr_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     # stds_rack = sectempdeck.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap')
     ww_plate1 = protocol.load_labware('bioer_96_wellplate_2200ul', '1')
-    ww_plate2 = protocol.load_labware('bioer_96_wellplate_2200ul', '5')
+    # ww_plate2 = protocol.load_labware('bioer_96_wellplate_2200ul', '5')
 
     # PIPETTES
     p20 = protocol.load_instrument(
@@ -55,8 +55,8 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     LU_Mix = fuge_rack['A1'] # LU MasterMix
-    water = fuge_rack['A6'] # water
-    LUPositive = fuge_rack['D6'] # LU Positive Control plasmid
+    # water = fuge_rack['A6'] # water
+    # LUPositive = fuge_rack['D6'] # LU Positive Control plasmid
     
      # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -70,12 +70,12 @@ def run(protocol: protocol_api.ProtocolContext):
     for row in rows: #8 rows
         for col in range(1,13): #12 cols
             dest = row+str(col)
-            print ("height is: ", h_list[well_num-1])
+            # print ("height is: ", h_list[well_num-1])
             p20.aspirate(15, LU_Mix.bottom(h_list[well_num-1]), rate=0.75) #head vol for more accurate pipetting
             protocol.delay(seconds=1) #equilibrate
             p20.move_to(LU_Mix.bottom(38))
             protocol.delay(seconds=1) #equilibrate
-            p20.touch_tip(v_offset=-3)
+            p20.touch_tip(v_offset=-4)
             p20.dispense(15, pcr_plate[dest].bottom(1))
             p20.blow_out(pcr_plate[dest].bottom(8))
             p20.touch_tip()
@@ -103,7 +103,6 @@ def run(protocol: protocol_api.ProtocolContext):
                 p20.dispense(5, pcr_plate[dest3].bottom(1))    
                 p20.touch_tip()    
                 p20.drop_tip()
-                
                 p20.pick_up_tip()
                 p20.aspirate(18, ww_plate[source].bottom(1))
                 protocol.delay(seconds=2) #equilibrate
