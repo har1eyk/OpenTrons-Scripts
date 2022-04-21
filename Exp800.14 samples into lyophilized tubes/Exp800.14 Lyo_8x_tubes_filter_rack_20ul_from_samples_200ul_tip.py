@@ -16,11 +16,9 @@ metadata = {
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
-    stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
+    stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
-    # tempdeck = protocol.load_module('tempdeck', '4')
+    tempdeck = protocol.load_module('tempdeck', '10')
     # plate = tempdeck.load_labware('opentrons_96_aluminumblock_generic_pcr_strip_200ul')
     holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '3')
     holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '6')
@@ -29,9 +27,9 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
-    p20 = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack20]
-    )
+    # p20 = protocol.load_instrument(
+    #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
+    # )
     
     # REAGENTS
     #fuge_rack @ position 1
@@ -52,7 +50,7 @@ def run(protocol: protocol_api.ProtocolContext):
     SAMP_5mix = stds_rack['B4'] # empty
     SAMP_6mix = stds_rack['B5'] # empty
     SAMP_7mix = stds_rack['B6'] # empty
-    SAMP_8mix = stds_rack['C1'] # empty
+    SAMP_8mix = stds_rack['D6'] # empty
     # SAMP_2mix = stds_rack['B6'] # empty
     # SAMP_3mix = stds_rack['C1'] # empty
     # SAMP_4mix = stds_rack['C2'] # empty
@@ -63,44 +61,33 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
-    num_of_sample_reps = 12
-    # is num_of_sample_reps > 12?
+    num_of_sample_reps_per_holder = 4 # can't exceed 6
     holderList = [holder_1, holder_2]
     # holderList = [holder_1]
-    add_sample_vol = 2
-    tot_sample_vol = 20
-    add_water_vol = tot_sample_vol-add_sample_vol
+    
     # lists
     # ALL_SAMPs = [samp_1, samp_2, samp_3, samp_4, samp_5, samp_6, samp_7, WATER]
-    SAMP_mixes = [SAMP_1mix, SAMP_2mix, SAMP_3mix, SAMP_4mix, SAMP_5mix, SAMP_6mix, SAMP_7mix, SAMP_8mix  ]
+    SAMP_mixes = [SAMP_1mix, SAMP_2mix, SAMP_3mix, SAMP_4mix, SAMP_5mix, SAMP_6mix, SAMP_7mix, SAMP_8mix]
     # SAMP_mixes = [SAMP_1mix, SAMP_2mix, SAMP_3mix, SAMP_4mix, SAMP_5mix, SAMP_6mix, SAMP_7mix, WATER]
     SAMP_wells = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     
     # #### COMMANDS ######    
     # Add sample DNA, mix, distribute to strip tubes
     for i, mixtube in enumerate(SAMP_mixes):
-        for y in range(0, len(holderList)):
+        for y in range(0, len(holderList)): #usually length 1 or 2
             p300.pick_up_tip()
             p300.move_to(mixtube.bottom(40))
-            p300.aspirate(6*20*1.08, mixtube.bottom(2), rate=0.75) # 6*20*1.08 = 130
+            p300.aspirate(num_of_sample_reps_per_holder*20*1.10, mixtube.bottom(2)) # 6*20*1.08 = 130
             protocol.delay(seconds=1) #equilibrate
             p300.touch_tip(v_offset=-3)
             holderPos = y
             holder = holderList[holderPos]
-            start = 6*y
-            stop = num_of_sample_reps if num_of_sample_reps <= 6*y+6  else 6*y+6 # This is max it can go in cycle; can't go above e.g. A13 !<>
-            for x in range(start, stop): # samples in 1-6, 7-12, 13-18 increments
-                # print ("start: ", start, "stop: ", stop)
+            for x in range(num_of_sample_reps_per_holder): # samples in holder
                 row = SAMP_wells[i]
-                dest = row+str(2*x+1-12*holderPos) # need +1 offset for col 
+                dest = row+str(2*x+1) # need +1 offset for col 
                 p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
                 p300.dispense(20, holder[dest].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
-                # p300.move_to(holder[dest].bottom(8))
-                # p300.blow_out(holder[dest].bottom(8))
                 p300.touch_tip()
                 p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
                 p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
-                # p300.move_to(holder[dest].bottom(40)) #move back holder in +4cm pos
-                # p300.move_to(mixtube.bottom(40)) #return to tube at +4cm so no crash into lyo tubes
-        # p300.drop_tip()
             p300.drop_tip()
