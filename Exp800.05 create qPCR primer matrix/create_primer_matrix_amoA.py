@@ -56,8 +56,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
-    stds_mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2') # this is where standards are mixed
-    stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '3')
+    stds_mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '3') # this is where standards are mixed
+    stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
@@ -75,13 +75,13 @@ def run(protocol: protocol_api.ProtocolContext):
     # REAGENTS
     # sds_rack 
     # keep this rack separate as to avoid contamination
+    std_1 = stds_rack['A3'] # 990ul Water and ssDNA standard
     std_2 = stds_rack['A4'] # 900ul water and ssDNA standard
     std_3 = stds_rack['A5'] # 900ul water and ssDNA standard
     std_4 = stds_rack['A6'] # 900ul water and ssDNA standard
-    std_5 = stds_rack['B3'] # 900ul water and ssDNA standard
-    std_1 = stds_rack['A3'] # 990ul Water and ssDNA standard
-    std_6 = stds_rack['B4'] # 900ul water and ssDNA standard 
-    std_7 = stds_rack['B5'] # 900ul water and ssDNA standard
+    std_5 = stds_rack['B1'] # 900ul water and ssDNA standard
+    std_6 = stds_rack['B2'] # 900ul water and ssDNA standard 
+    std_7 = stds_rack['B3'] # 900ul water and ssDNA standard
     # sds_mix_rack
     sN_mix = stds_mix_rack['A1'] # empty; receives BPW_mix and water for stds 
     std_1mix = stds_mix_rack['C3'] # empty
@@ -123,6 +123,7 @@ def run(protocol: protocol_api.ProtocolContext):
     std_wells = ['G1', 'G4', 'G7', 'G10', 'H1', 'H4', 'H7', 'H10']
    
     # user inputs
+    dna_XFR_bpwd_mix_tube = std_4 # this is the tube that will be used to mix the DNA into the bpwd_mix, 0.2ul
     orig_F_conc = 10 # What is the starting F primer concentration? (in uM)
     orig_R_conc = 10 # What is the starting R primer concentration? (in uM)
     orig_P_conc = 10 # What is probe starting concentration? (in uM)
@@ -392,7 +393,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # Second, add std_5 DNA or other std. 0.2ul added instead of 2ul to avoid using large volumes of std
     p20.transfer(
         dna_XFR_bpwd_mix, #16.8ul
-        std_5.bottom(3),
+        dna_XFR_bpwd_mix_tube.bottom(3),
         bpwd_mix.bottom(24),
         mix_after=(2, dna_XFR_bpwd_mix),
         blow_out=True,
@@ -407,7 +408,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     p300.mix(2, 200, bpwd_mix.bottom(4)) #second to last height; for mixing at bottom
     p300.mix(2, 200, bpwd_mix.bottom(8)) #mid tip height
-    p300.mix(5, 200, bpwd_mix.bottom(bpwd_heights[0])) #first tip height; need thorough mix
+    p300.mix(5, 200, bpwd_mix.bottom(bpwd_heights[3])) #third tip height; need thorough mix
     p300.blow_out(bpwd_mix.bottom(bpwd_heights[0]+2)) # bring tip up from solution
     for Rtube, h in zip(all_R_mix, bpwd_heights):
         for r in range(2):
