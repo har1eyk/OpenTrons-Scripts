@@ -67,13 +67,13 @@ def run(protocol: protocol_api.ProtocolContext):
     # Lists
     BioMix_cols = ['1', '3', '5', '7', '9', '11']
     
-    beta = [b_std_1, b_std_6, b_std_7] #two concentrations from beta
+    beta = [b_std_1, b_std_6, b_std_7] #really gamma
     beta_wells = [['A1', 'A3', 'A5', 'A7', 'A9', 'A11'], ['B1', 'B3', 'B5', 'B7', 'B9', 'B11'], ['G1', 'G5', 'G9']] # triplicate
 
-    gamma = [g_std_1, g_std_6, g_std_7]
+    gamma = [g_std_1, g_std_6, g_std_7] #really kappa
     gamma_wells = [['C1', 'C3', 'C5', 'C7', 'C9', 'C11'], ['D1', 'D3', 'D5', 'D7', 'D9', 'D11'], ['G3', 'G7', 'G11']]
     
-    delta = [d_std_1, d_std_6, d_std_7]
+    delta = [d_std_1, d_std_6, d_std_7] #really delta
     delta_wells = [['E1', 'E3', 'E5', 'E7', 'E9', 'E11'], ['F1', 'F3', 'F5', 'F7', 'F9', 'F11'], ['H1', 'H5', 'H9']]
     
     # NEG_wells = ['H1', 'H2', 'H3', 'H7', 'H8', 'H9'] # no room
