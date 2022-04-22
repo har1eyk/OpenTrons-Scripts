@@ -50,7 +50,7 @@ def tip_heightsEpp(init_vol, steps, vol_dec):
     if init_vol > 2000:
         offset = 12 # model out of range; see sheet
     else:
-        offset = 11 #mm Need to add offset to ensure tip reaches below liquid level
+        offset = 8 #mm Need to add offset to ensure tip reaches below liquid level
     for i in range(steps):
         x = init_vol-vol_dec*i
         vols.append(x)
@@ -100,10 +100,8 @@ def run(protocol: protocol_api.ProtocolContext):
      
     # REAGENTS
     # mix_rack
-    mmix = 
-    # sds_rack 
-    BPW_mix = fuge_rack['A1'] # 14.8*96(1+0.3)=1847.04
-    # keep this rack separate as to avoid contamination
+    BPW_mix = mmix_rack['A1'] # 14.8*96(1+0.3)=1847.04
+    # sds_rack (keep this rack separate as to avoid contamination)
     std_1 = stds_rack['A3'] # 990ul Water and ssDNA standard
     std_2 = stds_rack['A4'] # 900ul water and ssDNA standard
     std_3 = stds_rack['A5'] # 900ul water and ssDNA standard
@@ -121,7 +119,6 @@ def run(protocol: protocol_api.ProtocolContext):
     std_6mix = stds_mix_rack['D4'] # empty
     std_7mix = stds_mix_rack['D5'] # empty
     NTC_mix = stds_mix_rack['D6'] # empty, receives sN_mix and water as NTC
-    
     #fuge_rack
     bpwd_mix = fuge_rack['A1'] #empty
     liquid_trash = fuge_rack['B1']
@@ -182,11 +179,11 @@ def run(protocol: protocol_api.ProtocolContext):
     R_reps = 12 # How many wells will use R primer at particular concentration? (int)
     # F_reps = 12 # How many wells will use F primer at particular concentration? (int)
     F_int_vol = 100 # What is the volume of F intermediate primer in new tube? (in ul)
-    percent_waste =  0.20 # What percentage waste? (decimal)
-    sN_mix_waste_offset = 0.025  # How much percent_waste offset should sN_mix use? This calculated as percent_waste-sN_mix_overage = percent_waste for sN_mix_overage e.g. (20-7=13%) Should not be 0 otherwise offset = percent_waste. (decimal)
+    percent_waste =  0.25 # What percentage waste? (decimal)
+    sN_mix_waste_offset = 0.03  # How much percent_waste offset should sN_mix use? This calculated as percent_waste-sN_mix_overage = percent_waste for sN_mix_overage e.g. (20-7=13%) Should not be 0 otherwise offset = percent_waste. (decimal)
     R_mix_waste_offset = 0.11  # How much percent_waste offset should R_mix use? This calculated as percent_waste-R_mix_overage = percent_waste for R_mix_overage e.g. (20-=13%) If 0, then offset = percent_waste. (decimal)
     std_NTC_waste_offset = 0.028 # How much percent_waste offset should std_NTC use? (decimal)
-    bpw_waste_offset = 0.032 # How much percent_waste offset should bpw_waste use? (decimal)
+    bpw_waste_offset = 0.065 # How much percent_waste offset should bpw_waste use? (decimal)
     p300_max_vol = 200
     R_total_vol = 300 # what is the volume of the R primer at 10uM? Should be about 300ul.
     F_total_vol = 300 # what is the volume of the F primer at 10uM? Should be about 300ul.
@@ -323,12 +320,13 @@ def run(protocol: protocol_api.ProtocolContext):
         amt = split_asp(BWP_mix_xfer_sN_mix, p300_max_vol)[j]
         p300.aspirate(amt, BPW_mix.bottom(bpw_heights[j]), rate=0.4)
         protocol.delay(seconds=1) #equilibrate
+        p300.move_to(BPW_mix.bottom(bpw_heights[j])) #touch tip to fluid to remove residue
         h = tip_heights(amt+amt*j, 1, 0)[0]
         p300.dispense(amt, sN_mix.bottom(h+5), rate=0.5)
-        p300.blow_out(sN_mix.bottom(h+10)) # want to be above liquid level
-        p300.touch_tip()
+        p300.blow_out(sN_mix.bottom(h+15)) # want to be above liquid level
+        p300.move_to(sN_mix.bottom(h)) # want to remove fluid droplets
     p300.drop_tip()
-    # transfer water to sN__mix
+    #transfer water to sN__mix
     p300.transfer(
             std_woff_add_to_sN_mix, # ~55ul
             water.bottom(5),
@@ -399,7 +397,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.dispense(20, plate[dest].bottom(2), rate=0.85)
             p20.move_to(plate[dest].bottom(5))
             p20.blow_out()
-            # p20.touch_tip()
+            p20.touch_tip()
         p300.drop_tip()
         p20.drop_tip()
 
@@ -408,6 +406,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     #  tip_heights is a function using total_vol, # steps, and aliquot (vol decrement) amt as parameters.
     bpwd_xfer_h = tip_heightsEpp(BPW_mix_tot-BWP_mix_xfer_sN_mix, len(split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)), split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)[0])
+    print("split--bpw_mix_xfer_bpwd_mix: ", split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol))
     p300.mix(3, 200, BPW_mix.bottom(bpwd_xfer_h[0]))
     for j in range(len(split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol))): # split_asp is a function that returns equally divided aspirations
         amt = split_asp(bpw_mix_xfer_bpwd_mix, p300_max_vol)[j]
@@ -422,7 +421,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.transfer(
         dna_XFR_bpwd_mix, #16.8ul
         dna_XFR_bpwd_mix_tube.bottom(3),
-        bpwd_mix.bottom(24),
+        bpwd_mix.bottom(5), # go to bottom for better mixing
         mix_after=(2, dna_XFR_bpwd_mix),
         blow_out=True,
         blowout_location='destination well')
@@ -430,14 +429,17 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.transfer(
         water_XFR_bpwd_mix, # ~151.4ul
         water.bottom(20), # vol = 900 - std_DNA_xfer_to_stds_mix (~7ul) = 893ul. 
-        bpwd_mix.bottom(24))
+        bpwd_mix.bottom(23)) # mixing here okay with P300. 
     # Last, transfer bpwd_mix to intermediate R tubes (R_mix_1)
-    bpwd_heights = tip_heights(bpwd_mix_tot, len(all_R_mix), bpwd_mix_xfer_R_mix)
+    bpwd_heights = tip_heights(bpwd_mix_tot, len(all_R_mix), bpwd_mix_xfer_R_mix) #don't need to *2, /2 to get tip_heights; loop is enough
+    print ("bpwd_heights: ", bpwd_heights)
     p300.pick_up_tip()
-    p300.mix(2, 200, bpwd_mix.bottom(4)) #second to last height; for mixing at bottom
-    p300.mix(2, 200, bpwd_mix.bottom(8)) #mid tip height
-    p300.mix(5, 200, bpwd_mix.bottom(bpwd_heights[3])) #third tip height; need thorough mix
+    p300.mix(2, 200, bpwd_mix.bottom(8)) #second to last height; for mixing at bottom
+    p300.mix(2, 200, bpwd_mix.bottom(12)) #mid tip height
+    p300.mix(2, 200, bpwd_mix.bottom(bpwd_heights[3])) #third tip height; need thorough mix
+    p300.mix(2, 200, bpwd_mix.bottom(bpwd_heights[1])) #third tip height; need thorough mix
     p300.blow_out(bpwd_mix.bottom(bpwd_heights[0]+2)) # bring tip up from solution
+    p300.move_to(bpwd_mix.bottom(bpwd_heights[0])) # touch tip to remove residual liquid
     for Rtube, h in zip(all_R_mix, bpwd_heights):
         for r in range(2):
             p300.aspirate(bpwd_mix_xfer_R_mix/2, bpwd_mix.bottom(h), rate=0.8) # bpwd_rxn*row reps (12) * waste = 16.8*12*(1+.12-0.05)=
