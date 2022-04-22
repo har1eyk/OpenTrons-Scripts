@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Create Pos Control Dilution Series for qPCR',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create a 15-tube pos control dilution series on a 24-well rack.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 ##########################
 def run(protocol: protocol_api.ProtocolContext):
