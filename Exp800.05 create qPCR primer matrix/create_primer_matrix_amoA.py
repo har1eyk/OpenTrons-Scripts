@@ -148,7 +148,7 @@ def run(protocol: protocol_api.ProtocolContext):
     std_wells = ['G1', 'G4', 'G7', 'G10', 'H1', 'H4', 'H7', 'H10']
    
     # user inputs
-    dna_XFR_bpwd_mix_tube = std_4 # this is the tube that will be used to mix the DNA into the bpwd_mix, 0.2ul
+    dna_XFR_bpwd_mix_tube = std_4 # really "Tube_6"; this is the tube that will be used to mix the DNA into the bpwd_mix, 0.2ul
     orig_F_conc = 10 # What is the starting F primer concentration? (in uM)
     orig_R_conc = 10 # What is the starting R primer concentration? (in uM)
     orig_P_conc = 10 # What is probe starting concentration? (in uM)
