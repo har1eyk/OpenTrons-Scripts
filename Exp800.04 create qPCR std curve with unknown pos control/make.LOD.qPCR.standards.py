@@ -27,10 +27,6 @@ def run(protocol: protocol_api.ProtocolContext):
     #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
     # )
      
-
-
-
-     
     # REAGENTS 
     std_1 = fuge_rack['A1'] # 900ul Water
     std_2 = fuge_rack['A2'] # 900ul water
