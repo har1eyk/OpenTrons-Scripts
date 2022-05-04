@@ -6,10 +6,22 @@ metadata = {
     'protocolName': 'Create Pos Control Dilution Series for qPCR',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create a 12-tube pos control dilution series on a 24-well rack.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 ##########################
 # functions
+# returns zipped array of volumes and heights for
+# simultaneous dispensing and tip ascension
+# to reduce chance of air pocket formation
+def d_dispense(vol:int, steps:int, height:float):
+    # what is the height of total volume?
+    lowestHeight = 1 # don't go lower than this
+    heightIncrement = (height-lowestHeight)/steps
+    heightList = list(range(1,steps)) # make a list from 1..steps
+    heightArray =[1] + [1+x*heightIncrement for x in heightList]
+    volArray = [vol/steps]*steps
+    return zip(volArray, heightArray)
+
 # calculates ideal tip height for entering liquid
 def tip_heights(init_vol, steps, vol_dec):
     vols = []
@@ -40,9 +52,10 @@ def tip_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '4')
+    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
+    # mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
+    # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
     stds_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     
@@ -50,9 +63,9 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
-    p20 = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack20]
-    )
+    # p20 = protocol.load_instrument(
+    #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
+    # )
      
     # REAGENTS 
     std_1 = fuge_rack['A1'] # diluted standard
@@ -71,16 +84,16 @@ def run(protocol: protocol_api.ProtocolContext):
     std_14 = fuge_rack['C2']
     std_15 = fuge_rack['C3']
     # pos_control = fuge_rack['D1'] # pos control @1uM
-    water = fuge_rack['D5'] # 1500ul water
-    mmix = fuge_rack['D6'] # 1332ul
+    water = fuge_rack['D6'] # 1500ul water
+    mmix = fuge_rack['D5'] # 18*(96-16)*1.1 = 1584ul
     
     # CALCS
-    mix_per_well = 15 #how much volume (ul) mastermix should be in each well?
+    mix_per_well = 18 #how much volume (ul) mastermix should be in each well?
     overage = 0.125 # e.g. twenty percent waste as decimal
     reps = 4 #how many replicates of each std?
     multiwell_mix = mix_per_well*reps*(1+overage) # 18*4*(1+0.125) = 81
-    sample_per_well = 5
-    multisample_mix = sample_per_well*reps*(1+overage)
+    sample_per_well = 2
+    multisample_mix = sample_per_well*reps*(1+overage) # 2*4*(1+0.125) = 9
     # LISTS
     probe_wells=['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'A6', 'B6', 'C6', 'D6', 'E6', 'F6', 'G6', 'H6']
     std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15, water]
@@ -88,7 +101,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
    
     #### COMMANDS ######
-    # Mix, pipette mastermix containing probe to each well on plate 
+    # # Mix, pipette mastermix containing probe to each well on plate 
     p300.pick_up_tip()
     p300.mix(3, 200, mmix.bottom(20)) #first height
     for well, h in zip(probe_wells, tip_heights(1584, len(std_wells), multiwell_mix)):
@@ -96,51 +109,59 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(seconds=2) #tip equilibrate
         p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
         protocol.delay(seconds=2) #tip droplets slide
-        p300.touch_tip(v_offset=-4) #touch 3 mm below surface
-        p300.dispense(multiwell_mix, stds_plate[well])
+        p300.move_to(mmix.bottom(h)) # excess tip fluid condense 
+        p300.touch_tip(v_offset=-4) #touch 4 mm below surface
+        for volD, heightD in d_dispense(multiwell_mix, 6, 6):
+            p300.dispense(volD, stds_plate[well].bottom(heightD))
+        # p300.dispense(multiwell_mix, stds_plate[well])
+        p300.blow_out(stds_plate[well].bottom(12))
+        p300.move_to(stds_plate[well].bottom(2))
         p300.touch_tip()
     p300.drop_tip()
     
-    # add pos control stds to PROBE mmxs into plate wells and dispense into neighboring wells
-    for i in range(len(std_wells)): #loop 13x, water tube last
-        # p20.pick_up_tip()
-        p300.pick_up_tip() #double barrel
-        p20.pick_up_tip()
-        # p20.distribute(
-        #     multisample_mix,
-        #     std_wells[i].bottom(20),
-        #     stds_plate[probe_wells[i]].bottom(2),
-        #     new_tip='always',
-        #     touch_tip=True
-        # )
-        p300.aspirate(multisample_mix, std_wells[i].bottom(20)) # transer 8ul from oligo mix to mmix spot
-        p300.touch_tip() 
-        p300.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2), rate=0.6) #dispense into 54ul in sybr_wells[i] on plate
-        protocol.delay(seconds=2)
-        # p20.mix(2, 20, stds_plate[probe_wells[i]].bottom(4)) # remove inside soln
-        # p20.move_to(stds_plate[probe_wells[i]].bottom(10)) #above mmix solution
-        # protocol.delay(seconds=2)
-        # p300.blow_out(stds_plate[probe_wells[i]].bottom(14))
-        # p300.touch_tip()
-        # p300.move_to(stds_plate[probe_wells[i]].bottom(40)) # add this so it doesn't crash into plate
-        p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(2), rate=0.5) # can't be mixed homogenously with p20 #ivetried
-        p300.move_to(stds_plate[probe_wells[i]].bottom(10)) #above mmix solution
-        protocol.delay(seconds=2) #outside fluid coalesce 
-        p300.blow_out(stds_plate[probe_wells[i]].bottom(12))
-        p300.touch_tip()
-        # transfer to adjacent wells
-        for x in range(1,5): # need int 1, 2, 3 and 4.
-            p20.aspirate(20, stds_plate[probe_wells[i]].bottom(2), rate=0.75) # asp from 54ul, dispense to neighbor well
-            protocol.delay(seconds=2) #equilibrate
-            # find digits in well, A1 and A10 and puts into list
-            findNums = [int(i) for i in probe_wells[i].split()[0] if i.isdigit()]
-            # joins nums from list [1, 0] -> 10 type = string
-            colNum = ''.join(map(str, findNums))
-            # this finds row
-            row = probe_wells[i].split()[0][0]
-            # put it all together into a destination well
-            dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
-            p20.dispense(20, stds_plate[dest].bottom(2), rate=0.75)
-            p20.touch_tip()
-        p300.drop_tip()
-        p20.drop_tip()
+    # # add pos control stds to PROBE mmxs into plate wells and dispense into neighboring wells
+    # for i in range(len(std_wells)): #loop 13x, water tube last
+    #     p20.pick_up_tip()
+    #     p300.pick_up_tip() #double barrel
+    #     # p20.pick_up_tip()
+    #     p20.aspirate(multisample_mix, std_wells[i].bottom(15))
+    #     p20.move_to(std_wells[i].bottom(30))
+    #     # protocol.delay(seconds=2) #coalescing step
+    #     p20.move_to(std_wells[i].bottom(18)) # remove fluid from tip
+    #     p20.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2))
+    #     p20.blow_out(stds_plate[probe_wells[i]].bottom(10))
+    #     p20.move_to(stds_plate[probe_wells[i]].bottom(2)) #remove fluid
+
+    #     # p300.aspirate(multisample_mix, std_wells[i].bottom(20)) # transer 8ul from oligo mix to mmix spot
+    #     # p300.touch_tip() 
+    #     # p300.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2), rate=0.6) #dispense into 54ul in sybr_wells[i] on plate
+    #     protocol.delay(seconds=2)
+    #     # p20.mix(2, 20, stds_plate[probe_wells[i]].bottom(4)) # remove inside soln
+    #     # p20.move_to(stds_plate[probe_wells[i]].bottom(10)) #above mmix solution
+    #     # protocol.delay(seconds=2)
+    #     # p300.blow_out(stds_plate[probe_wells[i]].bottom(14))
+    #     # p300.touch_tip()
+    #     # p300.move_to(stds_plate[probe_wells[i]].bottom(40)) # add this so it doesn't crash into plate
+    #     p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(1), rate=0.5) # can't be mixed homogenously with p20 #ivetried
+    #     p300.move_to(stds_plate[probe_wells[i]].bottom(12)) #above mmix solution
+    #     protocol.delay(seconds=2) #outside fluid coalesce 
+    #     p300.blow_out(stds_plate[probe_wells[i]].bottom(12))
+    #     p300.move_to(stds_plate[probe_wells[i]].bottom(2)) #above mmix solution
+
+    #     # p300.touch_tip()
+    #     # transfer to adjacent wells
+    #     for x in range(1,5): # need int 1, 2, 3 and 4.
+    #         p20.aspirate(20, stds_plate[probe_wells[i]].bottom(1), rate=0.75) # asp from 54ul, dispense to neighbor well
+    #         protocol.delay(seconds=2) #equilibrate
+    #         # find digits in well, A1 and A10 and puts into list
+    #         findNums = [int(i) for i in probe_wells[i].split()[0] if i.isdigit()]
+    #         # joins nums from list [1, 0] -> 10 type = string
+    #         colNum = ''.join(map(str, findNums))
+    #         # this finds row
+    #         row = probe_wells[i].split()[0][0]
+    #         # put it all together into a destination well
+    #         dest = row+str(int(colNum)+x) # row + neighbor well i.e. 1, 2
+    #         p20.dispense(20, stds_plate[dest].bottom(1), rate=0.75)
+    #         p20.touch_tip()
+    #     p300.drop_tip()
+    #     p20.drop_tip()
