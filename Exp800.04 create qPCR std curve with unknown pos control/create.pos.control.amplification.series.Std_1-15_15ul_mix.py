@@ -125,9 +125,9 @@ def run(protocol: protocol_api.ProtocolContext):
     for i in range(len(std_wells)): #loop 13x, water tube last
         p20.pick_up_tip()
         p300.pick_up_tip() #double barrel
-        p300.aspirate(multisample_mix, std_wells[i].bottom(15))
+        p300.aspirate(multisample_mix, std_wells[i].bottom(4))
         p300.move_to(std_wells[i].bottom(30))
-        protocol.delay(seconds=1) #coalescing step
+        protocol.delay(seconds=3) #coalescing step
         p300.move_to(std_wells[i].bottom(18)) # remove fluid from tip
         p300.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2))
         p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(1), rate=0.5) # can't be mixed homogenously with p20 #ivetried
