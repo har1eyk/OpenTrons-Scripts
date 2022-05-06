@@ -52,8 +52,8 @@ def tip_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
-    mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
+    mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
+    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
@@ -85,7 +85,9 @@ def run(protocol: protocol_api.ProtocolContext):
     std_15 = fuge_rack['C3']
     # pos_control = fuge_rack['D1'] # pos control @1uM
     water = fuge_rack['D6'] # 1500ul water
-    mmix = fuge_rack['D5'] # 15*(96-16)*1.1 = 1320ul
+    
+    # mix_rack
+    mmix = mix_rack['A1'] # 15*(96-16)*1.1 = 1320ul
     
     # CALCS
     mix_per_well = 15 #how much volume (ul) mastermix should be in each well?
