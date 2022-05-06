@@ -5,7 +5,7 @@ from opentrons import protocol_api
 metadata = {
     'protocolName': 'Create Amplification Curve using Pos Control Dilution Series with 18ul MasterMix',
     'author': 'Harley King <harley.king@luminultra.com>',
-    'description': 'Create a 12-tube pos control dilution series on a 24-well rack.',
+    'description': 'Create a 4-rep pos control amplification in a 96w plate.',
     'apiLevel': '2.12'
 }
 ##########################
@@ -52,8 +52,8 @@ def tip_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
-    # mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
+    mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
+    fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
