@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Create RNA Dilution Series for Qauntified Sample',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create 8 tube dilution series on a 24-well rack for RNA cooling.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 ##########################
 
@@ -17,7 +17,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # pos_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
     # fuge_rack = protocol.load_labware('opentrons_24_tuberack_generic_2ml_screwcap', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
+    # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     # have this so I don't have to move it off
     # tempdeck = protocol.load_module('tempdeck', '4')
     sectempdeck = protocol.load_module('tempdeck', '10')
@@ -29,9 +29,9 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
-    p20 = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack20]
-    )
+    # p20 = protocol.load_instrument(
+    #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
+    # )
 
     # REAGENTS
     a_std_1 = fuge_rack['A1']  # 980ul Water + 20ul  Already prepared
