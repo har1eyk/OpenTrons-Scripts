@@ -63,8 +63,8 @@ def fifteen_ml_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    rack_1 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '10')
-    rack_2 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '11')
+    # rack_1 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '10')
+    # rack_2 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '11')
     rack_3 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '3')
     rack_4 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '4')
     rack_5 = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_screwcap', '5')
@@ -89,7 +89,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pos_control_begin_vol = 4000 # what is the beginning vol of the pos control?
     num_of_rounds = 1 # how many times should a full deck be processed? 9*24 = 216 tubes/round?
     #all_racks = [rack_1, rack_2, rack_3, rack_4, rack_5]
-    all_racks = [rack_1, rack_2, rack_3, rack_4, rack_5, rack_6, rack_7, rack_8, rack_9]
+    all_racks = [rack_3, rack_4, rack_5, rack_6, rack_7, rack_8, rack_9]
     # all_racks = [rack_1, rack_2]
     rack_rows = ['A', 'B', 'C', 'D']
     rack_cols = ['1', '2', '3', '4', '5', '6']

@@ -20,7 +20,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     # have this so I don't have to move it off
     # tempdeck = protocol.load_module('tempdeck', '4')
-    sectempdeck = protocol.load_module('tempdeck', '10')
+    sectempdeck = protocol.load_module('tempdeck', '1')
     # plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     fuge_rack = sectempdeck.load_labware(
         'opentrons_24_aluminumblock_generic_2ml_screwcap')
