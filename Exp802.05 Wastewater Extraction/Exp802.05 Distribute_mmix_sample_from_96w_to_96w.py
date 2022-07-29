@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Distribute Mmix and Wastewater Samples from 96w Deepwell to 96w Plate.',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Aliquoting SARS-CoV-2 mix to plate and then adding 5ul sample extraction from 96w DeepWell plate.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 
 ##########################
