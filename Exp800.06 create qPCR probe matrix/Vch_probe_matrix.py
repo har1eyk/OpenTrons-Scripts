@@ -102,8 +102,8 @@ def run(protocol: protocol_api.ProtocolContext):
      
     # REAGENTS
     # fuge_rack @ position 1
-    probe_10uM = fuge_rack['C1']
     water = fuge_rack['B2'] # 1000ul water
+    probe_10uM = fuge_rack['C1'] # 300ul
     fwd_10uM = fuge_rack['C2'] # min 300ul
     rev_10uM = fuge_rack['D2'] # min 300ul
     tube_upp = fuge_rack['A4'] # e.g. 0.625uM # empty
@@ -134,7 +134,7 @@ def run(protocol: protocol_api.ProtocolContext):
     std_7mix = mix_rack['D5'] # empty
     NTC_mix = mix_rack['D6'] # empty, receives sN_mix and water as NTC
     # mastermix_rack @ position 4
-    MIX_bw = fuge_rack['D1'] # see sheet, but gen around 1705 ul; use 2mL tube
+    MIX_bw = mastermix_rack['D1'] # see sheet, but gen around 1705 ul; use 2mL tube
    
     
     # user inputs
@@ -285,16 +285,16 @@ def run(protocol: protocol_api.ProtocolContext):
         blow_out=True,
         blowout_location='destination well')
     # transfer F primer @ std conditions to sN__mix
-    p300.transfer(
-        std_vol_F_mix, #22.08ul
+    p20.transfer(
+        std_vol_F_mix, #at 300nM, 8.3ul
         fwd_10uM.bottom(3), 
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
         mix_after=(2, 30),
         blowout_location='destination well')
     # transfer R primer @ std conditions to sN__mix
-    p300.transfer( #some resid fluid on outside
-        std_vol_R_mix, #22.08ul
+    p20.transfer( #some resid fluid on outside
+        std_vol_R_mix, #at 300nM, 8.3ul
         rev_10uM.bottom(3), 
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
@@ -302,7 +302,7 @@ def run(protocol: protocol_api.ProtocolContext):
         blowout_location='destination well')
         # transfer Probe @ std conditions to sN__mix
     p20.transfer( #some resid fluid on outside
-        std_vol_P_mix, #16.56ul
+        std_vol_P_mix, #at 300nM, 8.3ul
         probe_10uM.bottom(3), 
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
@@ -312,9 +312,9 @@ def run(protocol: protocol_api.ProtocolContext):
     # transfer sN_mix to intermediate tubes (std_mixes)
     std_mix_heights = tip_heights(mix_sn_tot, len(std_mixes), mix_sn_XFR_to_std_int)#[13,11,8,6,4,2,0]
     p300.pick_up_tip()
-    p300.mix(7, 200, sN_mix.bottom(5)) #4mm from bottom
-    p300.mix(7, 200, sN_mix.bottom(8)) #8mm from bottom
-    p300.mix(7, 200, sN_mix.bottom(std_mix_heights[0])) #13mm from bottom
+    p300.mix(3, 200, sN_mix.bottom(5)) #4mm from bottom
+    p300.mix(3, 200, sN_mix.bottom(8)) #8mm from bottom
+    p300.mix(3, 200, sN_mix.bottom(std_mix_heights[0])) #13mm from bottom
     p300.touch_tip()
     # p300.well_bottom_clearance.aspirate = std_mix_heights[0] #mm 
     for tube, h in zip(std_mixes, std_mix_heights):
@@ -325,6 +325,10 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(seconds=3) #tip droplets slide
         p300.touch_tip()
         p300.dispense(mix_sn_XFR_to_std_int, tube)
+        protocol.delay(seconds=1) #tip droplets slide
+        p300.move_to(sN_mix.bottom(12)) # excess tip fluid condense 
+        protocol.delay(seconds=1) #tip droplets slide
+        p300.move_to(sN_mix.bottom(tip_heights(mix_sn_XFR_to_std_int,1,1)[0])) # remove excees by touching tip to fluid level
     p300.drop_tip()
    
     # transfer std DNA into intermediate std_mixes tubes and then to plate
