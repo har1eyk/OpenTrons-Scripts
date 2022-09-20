@@ -112,15 +112,33 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.set_rail_lights(True)
 
     # aspirate mmix and dispense at different rates above empty tube
+
+    # for r in range(10): #
+    #     modRate = r/10 # dispense rate needs to be decimal 0..1
+    #     protocol.delay(seconds=2, msg="Dispensing 20ul at rate = {}%".format(r))
+    #     p300.dispense(20, empty_tube.bottom(70), rate = modRate)
+    # p300.drop_tip()
+
     p300.pick_up_tip()
     # p20.pick_up_tip() # It's double barrel time, kids
     mmixH = fifty_ml_heights(20000, 76, 180) # 180*5=900, 15*5 = 75 total steps
-    p300.aspirate(200, mmix.bottom(mmixH[0]))
-    p300.move_to(empty_tube.bottom(70))
-    for r in range(10): #
-        modRate = r/10 # dispense rate needs to be decimal 0..1
-        protocol.delay(seconds=2, msg="Dispensing 20ul at rate = {}%".format(r))
-        p300.dispense(20, empty_tube.bottom(70), rate = modRate)
+    # prewetting step for tip
+    p300.mix(3, 200, mmix.bottom(mmixH[4]))
+    for i in range(20):
+        p300.aspirate(200, mmix.bottom(mmixH[4]))
+        for r in range (10):
+            p300.move_to(empty_tube.bottom(70))
+            # volList = [10, 10, 10, 12, 12, 12, 14, 14, 14, 14]
+            # volList = [14.8, 14.8, 14.8, 14.9, 14.9, 14.9, 15, 15, 15, 15]
+            volList = [15, 15, 15, 15.1, 15.1, 15.1, 15.2, 15.2, 15.2, 15.2]
+            p300.dispense(volList[r], empty_tube.bottom(70), rate = 0.1)
+            p300.move_to(empty_tube.bottom(75))
+            p300.move_to(empty_tube.bottom(70))
+            protocol.delay(seconds=3)
+        p300.dispense(sum(volList), empty_tube.bottom(70))
+        p300.move_to(empty_tube.bottom(20))
+        p300.blow_out()
+        p300.touch_tip(empty_tube, v_offset=-0.3)
     p300.drop_tip()
 
     # repeat with P20
@@ -133,4 +151,4 @@ def run(protocol: protocol_api.ProtocolContext):
     # p20.drop_tip()
     
     # turn off robot rail lights
-    protocol.set_rail_lights(False)
+    # protocol.set_rail_lights(False)
