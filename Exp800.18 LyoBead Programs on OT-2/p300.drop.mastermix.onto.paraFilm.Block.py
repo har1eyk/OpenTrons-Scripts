@@ -5,7 +5,7 @@ from opentrons import protocol_api
 metadata = {
     'protocolName': 'LyoBead Creation on OT-2 in Block with Parafilm.',
     'author': 'Harley King <harley.king@luminultra.com>',
-    'description': 'Drops 15.8ul mastermix dispenses into Syrofoam container.',
+    'description': 'Drops 14.5ul mastermix dispenses into 96 Alum block with Parafilm.',
     'apiLevel': '2.12'
 }
 ##########################
@@ -114,10 +114,10 @@ def run(protocol: protocol_api.ProtocolContext):
     # mix_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '11') # keep this out of way of styrofoam container
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10') # have this so I don't have to move it off
-    alumBlock = tempdeck.load_labware('eppendorf_24_tuberack_2000ul')
+    alumBlock = tempdeck.load_labware('eppendorf_24_aluminumblock_2000ul')
     # alumBlock = tempdeck.load_labware('opentrons_24_aluminumblock_nest_1.5ml_screwcap')
     # styrofoam container as position 4, 5, 1 and 2. This container overlaps these positions. 
-    rack = protocol.load_labware('eppendorf_24_tuberack_2000ul', '3')
+    # rack = protocol.load_labware('eppendorf_24_tuberack_2000ul', '3')
     # cont_pos2 = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     # cont_pos4 = protocol.load_labware('vwr_24_tuberack_1500ul', '4')
     # cont_pos5 = protocol.load_labware('vwr_24_tuberack_1500ul', '5')
@@ -162,7 +162,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.mix(3, 200, mmix.bottom(mmixH[0])) #only need 9 dispenses at this volume: 1 is for burn, next 8 drop in container, last is for accuracy.
     # for i in range(int(totalPipetteRefills)):  
     i = 0 # height counter
-    for row in rows[0:4]: # loops through sliced or all rows on plate
+    for row in rows: # loops through sliced or all rows on plate
         print (mmixH[i])
         p300.aspirate(dispVol*10, mmix.bottom(mmixH[i]))
         p300.move_to(mmix.bottom(mmixH[i]+20))
@@ -176,7 +176,8 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.move_to(dest.bottom(contH)) # move to destination and pause for a few seconds to remove lateral motion
             protocol.delay(seconds=2)
             p300.dispense(dispVol, dest.bottom(contH), rate = 0.08) # want height to above parafilm, but not too high
-            p300.move_to(dest.bottom(contH+1))
+            protocol.delay(seconds=1)
+            p300.move_to(dest.bottom(contH+3))
             p300.move_to(dest.bottom(contH))
         p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
         p300.dispense((200-9*dispVol-4*dispVol), mmix.bottom(mmixH[i]+10))
