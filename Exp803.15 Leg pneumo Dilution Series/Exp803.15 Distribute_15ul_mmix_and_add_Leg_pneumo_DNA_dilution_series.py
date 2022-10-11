@@ -98,8 +98,8 @@ def run(protocol: protocol_api.ProtocolContext):
     a_std_15 =stds_rack['C3']  # from previous program, 750ul
     
     # mix_rack
-    LU_Mix = mix_rack['D1'] # LU MasterMix; must be in the same tubes as the a_stds, "2mL Epp snap cap" 15*96*1.1ul = 1710ul
-    neg = mix_rack['A1'] # Negative Control NFW 1000ul in 2mL Epp snap cap
+    LU_Mix = mix_rack['A1'] # LU MasterMix; must be in the same tubes as the a_stds, "2mL Epp snap cap" 15*96*1.1ul = 1710ul
+    neg = mix_rack['D6'] # Negative Control NFW 1000ul in 2mL Epp snap cap
 
     # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
