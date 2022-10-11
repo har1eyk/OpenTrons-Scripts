@@ -22,6 +22,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # plate = tempdeck.load_labware('opentrons_96_aluminumblock_generic_pcr_strip_200ul')
     holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '3')
     holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '6')
+    # holder_3 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '1')
+    # holder_4 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '4')
     # holder_3 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '7')
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -30,18 +32,19 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     # sds_rack  @ position 2
-    SAMP_1mix = stds_rack['A5'] # empty
-    SAMP_2mix = stds_rack['A6'] # empty
-    SAMP_3mix = stds_rack['B1'] # empty
-    SAMP_4mix = stds_rack['B2'] # empty
-    SAMP_5mix = stds_rack['B3'] # empty
-    SAMP_6mix = stds_rack['B4'] # empty
-    SAMP_7mix = stds_rack['B5'] # empty
-    SAMP_8mix = stds_rack['B6'] # empty
+    SAMP_1mix = stds_rack['A4'] # empty
+    SAMP_2mix = stds_rack['A5'] # empty
+    SAMP_3mix = stds_rack['A6'] # empty
+    SAMP_4mix = stds_rack['B1'] # empty
+    SAMP_5mix = stds_rack['B2'] # empty
+    SAMP_6mix = stds_rack['B3'] # empty
+    SAMP_7mix = stds_rack['B4'] # empty
+    SAMP_8mix = stds_rack['B5'] # empty
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
     num_of_sample_reps_per_holder = 6 # can't exceed 6
+    # holderList = [holder_1, holder_2, holder_3, holder_4]
     holderList = [holder_1, holder_2]
     # holderList = [holder_1]
     
