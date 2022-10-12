@@ -3,9 +3,9 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    'protocolName': 'LyoBead Creation on OT-2 Depositied on 96w Hydrophobic Plate.',
+    'protocolName': 'Transfer Mix from 15mL Conical to 96w BioER Plate.',
     'author': 'Harley King <harley.king@luminultra.com>',
-    'description': 'Drops 14.5ul mastermix dispenses into 96 Alum block with hydrophobic plate.',
+    'description': 'Aliquots user-specified volume mastermix into 96w BioER plate.',
     'apiLevel': '2.12'
 }
 ##########################
@@ -107,13 +107,14 @@ def fifty_ml_heights(init_vol, steps, vol_dec):
         else:
             heights.append(round(h, 1))
     return heights
-
+def closest_value(input_list: list, value: float):
+    return min(input_list, key=lambda x: abs(x-value))
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '9')
+    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tempdeck = protocol.load_module('tempdeck', '1') # have this so I don't have to move it off
-    hydroPlate = tempdeck.load_labware('noah_hydrophobic_thin_96_wellplate_200ul')
+    plate = tempdeck.load_labware('bioer_96_aluminumblock_200ul')
     mixBlock = protocol.load_labware('opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical', '2')
     
     
@@ -125,45 +126,46 @@ def run(protocol: protocol_api.ProtocolContext):
     # REAGENTS 
     # mastermix rack
     mmix = mixBlock['A1'] # in a 15mL tube in an enclosed 3d printed block with beads to maintain 4C. 
-    dispVol = 14.5
-    mmixVol = 1600 # if in 2mL tube, how much mastermix volume. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul. runs out at 1.1 with last 4-w dispense
+
+    # USER INPUTS
+    dispVol = 14.5 # min = 14.5, max = 20
+    mmixVol = 1600 # if in 2mL tube, how much mastermix volume. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul; For 20ul in 96w plate = 20*96 = *1.15= 2208ul
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
+    
     #### COMMANDS ######
     # turn on robot rail lights
     protocol.set_rail_lights(True) # turn on lights if not on
 
     p300.pick_up_tip()
-    contH = 0 # how many mm above tuberack height is the container height? 110mm is max.
-    # mmixH = fifty_ml_heights(17500, 20, 200) 
-    mmixH = fifteen_ml_heights(mmixVol, 3*8, dispVol*4) # each row goes to mix 3 times * 8 rows = 24 times
-    print (mmixH)#mix volume, total steps = totalPipetteRefills in dispVol*4 pipette volume  
+    contH = 2 # how many mm above tuberack height is the container height? 110mm is max.
+    mmixH = fifteen_ml_heights(mmixVol, 12, dispVol*8) # each column gets dispensed 8x. each row goes to mix 3 times * 8 rows = 24 times
     # prewetting step for tip
+    print (mmixH)
     p300.mix(3, 200, mmix.bottom(mmixH[4])) # need to go down a little because 200ul and don't want it to dry aspirate
-    # for i in range(int(totalPipetteRefills)):  
     i = 0 # height counter
-    for row in rows: # loops through sliced or all rows on plate
-        for r in range (3): # three sets of four across a row
-            p300.aspirate(dispVol*10, mmix.bottom(mmixH[i]))
-            p300.move_to(mmix.bottom(mmixH[i]+20))
-            protocol.delay(seconds=4)
-            p300.dispense(dispVol, mmix.bottom(mmixH[i]+20)) # dispense dispVol to improve volume accuracy in subsequent dispenses
-            protocol.delay(seconds=4) # tip for drops to coalesce
-            p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
-            p300.touch_tip(mmix, v_offset=-8, speed=20)
-            for dispNo in range(4): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
-                dest = hydroPlate[row+str(dispNo+1+(r*4))]
-                p300.move_to(dest.bottom(contH)) # move to destination and pause for a few seconds to remove lateral motion
-                protocol.delay(seconds=2)
-                p300.dispense(dispVol, dest.bottom(contH), rate = 0.08) # want height to above parafilm, but not too high
-                protocol.delay(seconds=1)
-                p300.move_to(dest.bottom(contH+3))
-                p300.move_to(dest.bottom(contH))
-            p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
-            p300.dispense((200-9*dispVol-4*dispVol), mmix.bottom(mmixH[i]+10))
-            p300.blow_out(mmix.bottom(mmixH[i]+4))
-            p300.move_to(mmix.bottom(mmixH[i])) # touch tip to fluid to remove residual mmix on tubes
-            i+=1 # increment height counter
+    for col in range(12):# loops through sliced or all columns on plate
+        p300.aspirate(200, mmix.bottom(mmixH[i])) # could aspirate dispVol*10
+        p300.move_to(mmix.bottom(mmixH[i]+20))
+        protocol.delay(seconds=4)
+        p300.dispense(dispVol, mmix.bottom(mmixH[i]+20)) # dispense dispVol to improve volume accuracy in subsequent dispenses
+        protocol.delay(seconds=4) # tip for drops to coalesce
+        p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
+        p300.touch_tip(mmix, v_offset=-5, speed=20)
+        for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
+            dest = plate[rows[dispNo]+str(col+1)] # destination well
+            p300.move_to(dest.bottom(contH)) # move to destination and pause for a few seconds to remove lateral motion
+            protocol.delay(seconds=2)
+            p300.dispense(dispVol, dest.bottom(contH), rate = 0.75) # want height to above parafilm, but not too high
+            protocol.delay(seconds=1)
+            p300.move_to(dest.bottom(contH+3)) # residual fluid coalesces
+            protocol.delay(seconds=1)
+            p300.move_to(dest.bottom(contH+1)) # remove excess fluid from tip
+        p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
+        p300.dispense((200-9*dispVol), mmix.bottom(mmixH[i]+10))
+        p300.blow_out(mmix.bottom(mmixH[i]+4))
+        p300.move_to(mmix.bottom(mmixH[i])) # touch tip to fluid to remove residual mmix on tubes
+        i+=1 # increment height counter
     p300.drop_tip()
 
  
