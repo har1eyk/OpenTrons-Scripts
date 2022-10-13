@@ -115,8 +115,8 @@ def run(protocol: protocol_api.ProtocolContext):
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10') # have this so I don't have to move it off
     alumBlock = tempdeck.load_labware('eppendorf_24_aluminumblock_2000ul')
-    tempdeckTwo = protocol.load_module('tempdeck', '11') # have this so I don't have to unplug it; off to side
-    mixBlock = tempdeckTwo.load_labware('eppendorf_24_aluminumblock_2000ul')
+    # tempdeckTwo = protocol.load_module('tempdeck', '11') # have this so I don't have to unplug it; off to side
+    # mixBlock = tempdeckTwo.load_labware('eppendorf_24_aluminumblock_2000ul')
     # alumBlock = tempdeck.load_labware('opentrons_24_aluminumblock_nest_1.5ml_screwcap')
     # styrofoam container as position 4, 5, 1 and 2. This container overlaps these positions. 
     # rack = protocol.load_labware('eppendorf_24_tuberack_2000ul', '3')
@@ -139,7 +139,7 @@ def run(protocol: protocol_api.ProtocolContext):
     mmix = alumBlock['D1'] # if in 2mL tube, what position on aluminum block
     # mmix = rack['D1'] # if in 2mL tube, what position on aluminum block
     dispVol = 14.5
-    mmixVol = 1531.2 # if in 2mL tube, how much mastermix volume = 96*14.5*1.1 = 1531.2ul
+    mmixVol = 1531.2 # if in 2mL tube, how much mastermix volume = 96*14.5*1.2 = 1670.4. 1600ul is ok, hjk, 20220930
 
     # relative dropping positions into tuberacks beginning from position 1->2->4->5
     dispPos = [cont_pos1['C1'], cont_pos1['C5'], cont_pos4['B5'], cont_pos4['B2']] # dispense in anti-clockwise positions
