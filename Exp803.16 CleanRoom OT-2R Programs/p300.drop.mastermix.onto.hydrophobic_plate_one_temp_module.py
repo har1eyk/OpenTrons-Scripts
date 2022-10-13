@@ -128,8 +128,8 @@ def run(protocol: protocol_api.ProtocolContext):
     mmix = mixBlock['A1'] # in a 15mL tube in an enclosed 3d printed block with beads to maintain 4C. 
 
     # USER INPUTS
-    dispVol = 14.5 # min = 14.5, max = 20
-    mmixVol = 1600 # if in 2mL tube, how much mastermix volume. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul; For 20ul in 96w plate = 20*96 = *1.15= 2208ul
+    dispVol = 20 # this is the volume dispensed into each well min = 14.5, max = 20
+    mmixVol = 2208 # this is the total volume in 15mL tube. Probably listed on recipe sheet. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul; For 20ul in 96w plate = 20*96 = *1.15= 2208ul
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
     
