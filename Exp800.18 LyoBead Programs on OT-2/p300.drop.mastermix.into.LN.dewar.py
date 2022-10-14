@@ -139,7 +139,7 @@ def run(protocol: protocol_api.ProtocolContext):
     mmix = alumBlock['D1'] # if in 2mL tube, what position on aluminum block
     # mmix = rack['D1'] # if in 2mL tube, what position on aluminum block
     dispVol = 20
-    mmixVol = 4000 # if in 2mL tube, how much mastermix volume = 96*14.5*1.2 = 1670.4. 1600ul is ok, hjk, 20220930
+    mmixVol = 2000 # if in 2mL tube, how much mastermix volume = 96*14.5*1.2 = 1670.4. 1600ul is ok, hjk, 20220930
 
     # relative dropping positions into tuberacks beginning from position 1->2->4->5
     dispPos = [cont_pos1['C1'], cont_pos1['C5'], cont_pos4['B5'], cont_pos4['B2']] # dispense in anti-clockwise positions
