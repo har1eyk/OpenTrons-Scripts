@@ -142,22 +142,22 @@ def run(protocol: protocol_api.ProtocolContext):
     mmixH = fifteen_ml_heights(mmixVol, 12, dispVol*8) # each column gets dispensed 8x. each row goes to mix 3 times * 8 rows = 24 times
     # prewetting step for tip
     print (mmixH)
-    p300.mix(3, 200, mmix.bottom(mmixH[4])) # need to go down a little because 200ul and don't want it to dry aspirate
+    p300.mix(2, 200, mmix.bottom(mmixH[0])) # a pre-moistened tip is more accurate. 
     i = 0 # height counter
     for col in range(12):# loops through sliced or all columns on plate
         p300.aspirate(200, mmix.bottom(mmixH[i])) # could aspirate dispVol*10
         p300.move_to(mmix.bottom(mmixH[i]+20))
-        protocol.delay(seconds=4)
+        protocol.delay(seconds=3)
         p300.dispense(dispVol, mmix.bottom(mmixH[i]+20)) # dispense dispVol to improve volume accuracy in subsequent dispenses
-        protocol.delay(seconds=4) # tip for drops to coalesce
+        protocol.delay(seconds=3) # tip for drops to coalesce
         p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
         p300.touch_tip(mmix, v_offset=-5, speed=20)
         for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
             dest = plate[rows[dispNo]+str(col+1)] # destination well
             p300.move_to(dest.bottom(contH)) # move to destination and pause for a few seconds to remove lateral motion
-            protocol.delay(seconds=2)
+            # protocol.delay(seconds=1)
             p300.dispense(dispVol, dest.bottom(contH), rate = 0.75) # want height to above parafilm, but not too high
-            protocol.delay(seconds=1)
+            # protocol.delay(seconds=1)
             p300.move_to(dest.bottom(contH+3)) # residual fluid coalesces
             protocol.delay(seconds=1)
             p300.move_to(dest.bottom(contH+1)) # remove excess fluid from tip
