@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Lyo Samples in 8-well strips from Tubes 1 to 15 plus NTC.',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Test qPCR Samples Using Lyophilized Samples in 8-well strips from Tubes 1 to 15 plus NTC.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 
 ##########################
@@ -16,7 +16,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # LABWARE
     stds_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
+    # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     # tempdeck = protocol.load_module('tempdeck', '4')
     # plate = tempdeck.load_labware('opentrons_96_aluminumblock_generic_pcr_strip_200ul')
     holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '3')
@@ -26,9 +26,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
-    p20 = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack20]
-    )
+   
     
     # REAGENTS
     std_1 = stds_rack['A1'] # 990ul Water
@@ -50,7 +48,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # user inputs
     # this is 4 reps on each tube e.g. 16*4 = 64 samples
-    num_of_sample_reps = 3 # doesn't yet accommodate other ints
+    num_of_sample_reps = 2 # doesn't yet accommodate other ints
     holderList = [holder_1, holder_2]
     tot_sample_vol = 20
     # lists

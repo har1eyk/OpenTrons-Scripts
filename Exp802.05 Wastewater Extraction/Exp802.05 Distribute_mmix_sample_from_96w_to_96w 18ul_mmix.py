@@ -53,20 +53,22 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     LU_Mix = fuge_rack['A1'] # LU MasterMix
-
-    sample_1 = sample_rack['A1']
-    sample_2 = sample_rack['A2']
-    sample_3 = sample_rack['A3']
-    sample_4 = sample_rack['A4']
+    
+    # the below dict can be used to replace samples with negatives or samples from other tubes
+    # sample_1 = sample_rack['A1']
+    # sample_2 = sample_rack['A2']
+    # sample_3 = sample_rack['A3']
+    # sample_4 = sample_rack['A4']
+    # sample_dict = {
+    #     'D7': sample_1,
+    #     'D12': sample_2,
+    #     'H7': sample_3,
+    #     'H12': sample_4}
     
      # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     tot_ww_plates = [ww_plate1]
-    sample_dict = {
-        'D7': sample_1,
-        'D12': sample_2,
-        'H7': sample_3,
-        'H12': sample_4}
+    
 
     # #### COMMANDS ######    
     # aspirate mmix to all wells in 96w plate; 18*96 = 1.1=1584
@@ -94,15 +96,15 @@ def run(protocol: protocol_api.ProtocolContext):
             for row in rows:
                 source = row + str(col) #A5, B5, C5
                 dest = row + str(col) #A1, #A2, #A3
-                if source == 'D7' or source=='D12' or source=='H7' or source=='H12': #
-                    source = sample_dict[source]
-                    p20.aspirate(2, source.bottom(1), rate=0.75)
-                    protocol.delay(seconds=2) #equilibrate
-                    p20.touch_tip()
-                    p20.dispense(2, pcr_plate[dest].bottom(1))
-                    p20.blow_out(pcr_plate[dest].bottom(8))
-                    p20.touch_tip()
-                    continue
+                # if source == 'D7' or source=='D12' or source=='H7' or source=='H12': #
+                #     source = sample_dict[source]
+                #     p20.aspirate(2, source.bottom(1), rate=0.75)
+                #     protocol.delay(seconds=2) #equilibrate
+                #     p20.touch_tip()
+                #     p20.dispense(2, pcr_plate[dest].bottom(1))
+                #     p20.blow_out(pcr_plate[dest].bottom(8))
+                #     p20.touch_tip()
+                #     continue
                 p20.aspirate(2, ww_plate[source].bottom(1), rate=0.75)
                 protocol.delay(seconds=2) #equilibrate
                 p20.touch_tip()

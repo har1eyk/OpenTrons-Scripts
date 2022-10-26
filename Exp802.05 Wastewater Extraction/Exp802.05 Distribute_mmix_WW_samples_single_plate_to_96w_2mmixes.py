@@ -79,7 +79,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 protocol.delay(seconds=1) #equilibrate
                 p20.move_to(pcrmix.bottom(38))
                 protocol.delay(seconds=1) #equilibrate
-                p20.touch_tip(v_offset=-3)
+                p20.touch_tip(v_offset=-4)
                 p20.dispense(15, pcr_plate[dest].bottom(1))
                 p20.blow_out(pcr_plate[dest].bottom(8))
                 p20.touch_tip()

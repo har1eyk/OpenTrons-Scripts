@@ -17,11 +17,11 @@ def run(protocol: protocol_api.ProtocolContext):
     # LABWARE
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '5')
     std_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '6')
-    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '1')
+    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '3')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '2')
     tempdeck = protocol.load_module('tempdeck', '10') # have this so I don't have to move it off
-    holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '8')
-    holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '9')
+    holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '7')
+    holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '4')
     stds_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     
 
@@ -97,15 +97,15 @@ def run(protocol: protocol_api.ProtocolContext):
     # add water to last 3 wells
     for row in rows[7:8]:
         p300.pick_up_tip()
-        p300.aspirate(80, water)
+        p300.aspirate(65, water)
         p300.touch_tip()
         for col in cols[3: ]:
             p300.move_to(holder_1[row + str(col)].bottom(40))
             p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
             p300.move_to(holder_1[row + str(col)].top()) 
-        p300.dispense(20, waste)
-        p300.blow_out(waste.bottom())
+        # p300.dispense(20, waste)
+        # p300.blow_out(waste.bottom())
         p300.drop_tip()
 
     # # add first 4 standards to top half of tubes
@@ -113,28 +113,28 @@ def run(protocol: protocol_api.ProtocolContext):
     count = 0 # keep track of standard 
     for row in rows[4:7]:
         p300.pick_up_tip()
-        p300.aspirate(80, std_conc[count])
+        p300.aspirate(65, std_conc[count])
         p300.touch_tip()
         for col in cols[3: ]:
             p300.move_to(holder_1[row + str(col)].bottom(40))
             p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-            # p300.touch_tip()
-            # p300.move_to(holder_1[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
-        # p300.blow_out(waste.bottom(5))
+            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(20, waste.bottom(5))
+        #p300.blow_out(waste.bottom(5))
         p300.drop_tip()
     count += 1 
 
     for row in rows:
         p300.pick_up_tip()
-        p300.aspirate(140, std_conc[count]) #take from standand 
+        p300.aspirate(125, std_conc[count]) #take from standand 
         p300.touch_tip()
         for col in cols:
             p300.move_to(holder_1[row + str(col)].bottom(40))
             p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75) # dispense in PCR tubes  
-            # p300.touch_tip()
-            # p300.move_to(holder_1[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
+            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(20, waste.bottom(5))
         # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
         count = count + 1
@@ -145,14 +145,14 @@ def run(protocol: protocol_api.ProtocolContext):
     count = 1 #reset count
     for row in rows[4: ]:
         p300.pick_up_tip()
-        p300.aspirate(80, std_conc[count])
+        p300.aspirate(65, std_conc[count])
         p300.touch_tip()
         for col in cols[0:3]:
             p300.move_to(holder_1[row + str(col)].bottom(40))
             p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-            # p300.touch_tip()
-            # p300.move_to(holder_1[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
+            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(20, waste.bottom(5))
         # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
         count = count + 1     
@@ -165,15 +165,15 @@ def run(protocol: protocol_api.ProtocolContext):
     #   # add water to last 3 wells
     for row in rows[7:8]:
         p300.pick_up_tip()
-        p300.aspirate(40, water)
+        p300.aspirate(25, water)
         p300.touch_tip()
         for col in cols[1:2]:
             p300.move_to(holder_2[row + str(col)].bottom(40))
             p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
             p300.move_to(holder_2[row + str(col)].top()) 
-        p300.dispense(20, waste.bottom(5))
-        p300.blow_out(waste.bottom(5))
+        # p300.dispense(20, waste.bottom(5))
+        # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
 
     
@@ -181,30 +181,30 @@ def run(protocol: protocol_api.ProtocolContext):
     count = 0
     for col in cols[1:2]:
         p300.pick_up_tip()
-        p300.aspirate(80, std_conc[count])
+        p300.aspirate(65, std_conc[count])
         p300.touch_tip()
         for row in rows[4:7]:
             p300.move_to(holder_2[row + str(col)].bottom(40))
             p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
             p300.move_to(holder_2[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
-        p300.blow_out(waste.bottom(5))
+        # p300.dispense(20, waste.bottom(5))
+        # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
     count += 1
         
     #add first 4 standards to top half of tubes
     for row in rows:
         p300.pick_up_tip()
-        p300.aspirate(60, std_conc[count]) #take from standand 
+        p300.aspirate(45, std_conc[count]) #take from standand 
         p300.touch_tip()
         for col in cols[0:2]:
             p300.move_to(holder_2[row + str(col)].bottom(40))
             p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75) # dispense in PCR tubes  
             p300.touch_tip()
             p300.move_to(holder_2[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
-        p300.blow_out(waste.bottom(5))
+        # p300.dispense(20, waste.bottom(5))
+        # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
         count = count + 1
         if count == 5:
@@ -214,15 +214,15 @@ def run(protocol: protocol_api.ProtocolContext):
     count = 1 #reset count
     for row in rows[4: ]:
         p300.pick_up_tip()
-        p300.aspirate(40, std_conc[count])
+        p300.aspirate(25, std_conc[count])
         p300.touch_tip()
         for col in cols[0:1]:
             p300.move_to(holder_2[row + str(col)].bottom(40))
             p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
             p300.move_to(holder_2[row + str(col)].top())
-        p300.dispense(20, waste.bottom(5))
-        p300.blow_out(waste.bottom(5))
+        # p300.dispense(20, waste.bottom(5))
+        # p300.blow_out(waste.bottom(5))
         p300.drop_tip()
         count = count + 1     
         if count == 5:

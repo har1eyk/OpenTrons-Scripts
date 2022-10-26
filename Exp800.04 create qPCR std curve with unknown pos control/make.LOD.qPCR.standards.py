@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Create Pos Control Dilution Series for qPCR including 5 tubes for LOD',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Create a 20-tube pos control dilution series on a 24-well rack.',
-    'apiLevel': '2.11'
+    'apiLevel': '2.12'
 }
 ##########################
 def run(protocol: protocol_api.ProtocolContext):
@@ -15,7 +15,7 @@ def run(protocol: protocol_api.ProtocolContext):
     pos_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
-    tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
+    # tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10') # have this so I don't have to move it off
     stds_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
     
@@ -23,9 +23,9 @@ def run(protocol: protocol_api.ProtocolContext):
     p300 = protocol.load_instrument(
         'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
-    p20 = protocol.load_instrument(
-        'p20_single_gen2', 'right', tip_racks=[tiprack20]
-    )
+    # p20 = protocol.load_instrument(
+    #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
+    # )
      
     # REAGENTS 
     std_1 = fuge_rack['A1'] # 900ul Water
@@ -50,6 +50,7 @@ def run(protocol: protocol_api.ProtocolContext):
     std_11_4 = fuge_rack['D4'] # no water; empty tube
     std_11_5 = fuge_rack['D5'] # no water; empty tube
 
+    # Positive Control Rack 
     pos_control = pos_rack['A1'] # 100-1000ul pos control @1uM
     water = pos_rack['D6'] # 1700ul water
     
