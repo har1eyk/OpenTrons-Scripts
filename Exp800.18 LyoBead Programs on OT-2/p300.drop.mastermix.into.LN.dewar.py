@@ -138,8 +138,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # mmix = mix_rack['A3'] # 20mL water in 50mL conical tube, 900*15 = 13500ul: 300*5 = 1500ul = 15mL
     mmix = alumBlock['D1'] # if in 2mL tube, what position on aluminum block
     # mmix = rack['D1'] # if in 2mL tube, what position on aluminum block
-    dispVol = 20
-    mmixVol = 2000 # if in 2mL tube, how much mastermix volume = 96*14.5*1.2 = 1670.4. 1600ul is ok, hjk, 20220930
+    dispVol = 14
+    mmixVol = 1540 # if in 2mL tube, how much mastermix volume = 96*14.5*1.2 = 1670.4. 1600ul is ok, hjk, 20220930
 
     # relative dropping positions into tuberacks beginning from position 1->2->4->5
     dispPos = [cont_pos1['C1'], cont_pos1['C5'], cont_pos4['B5'], cont_pos4['B2']] # dispense in anti-clockwise positions
