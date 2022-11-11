@@ -113,9 +113,9 @@ def run(protocol: protocol_api.ProtocolContext):
             for x in range(num_of_sample_reps_per_holder): # samples in holder
                 column = columns[i]
                 dest = str(2*x+1) # need +1 offset for col 
-                p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
+                p300.move_to(holder[zip(rep_rows,dest)].bottom(40)) #move across holder in +4cm pos
                 p300.dispense(20, holder[zip(rep_rows,dest)].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
                 p300.touch_tip()
-                p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
-                p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
+                p300.move_to(holder[zip(rep_rows,dest)].top()) # centers tip so tip doesn't lift tubes after touch
+                p300.move_to(holder[zip(rep_rows,dest)].bottom(40)) #move across holder in +4cm pos
             p300.drop_tip()
