@@ -112,9 +112,9 @@ def run(protocol: protocol_api.ProtocolContext):
             for col in columns[::2]: # every other column
                 for row in rows:
                     dest = (row + str(col))
-                    p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
+                    p300.move_to(holder[dest].bottom(40)) #move to holder in +4cm pos
                     p300.dispense(20, holder[dest].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
                     p300.touch_tip()
                     p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
-                    p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
+                    p300.move_to(holder[dest].bottom(40)) #move to holder in +4cm pos
             p300.drop_tip()
