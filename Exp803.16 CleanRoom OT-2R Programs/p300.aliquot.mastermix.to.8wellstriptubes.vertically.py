@@ -93,6 +93,9 @@ def run(protocol: protocol_api.ProtocolContext):
     # lists
     mixes = [mastermix]
     columns = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+    rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+
+    rep_rows=rows[:num_of_sample_reps_per_holder+1]
 
      #### COMMANDS ######
     # turn on robot rail lights
@@ -111,7 +114,7 @@ def run(protocol: protocol_api.ProtocolContext):
                 column = columns[i]
                 dest = str(2*x+1) # need +1 offset for col 
                 p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
-                p300.dispense(20, holder[dest].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
+                p300.dispense(20, holder[zip(rep_rows,dest)].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
                 p300.touch_tip()
                 p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
                 p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
