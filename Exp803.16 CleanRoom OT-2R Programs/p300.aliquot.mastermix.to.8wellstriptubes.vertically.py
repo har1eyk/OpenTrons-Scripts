@@ -95,7 +95,6 @@ def run(protocol: protocol_api.ProtocolContext):
     columns = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
-    rep_rows=rows[:num_of_sample_reps_per_holder+1]
 
      #### COMMANDS ######
     # turn on robot rail lights
@@ -110,7 +109,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.touch_tip(v_offset=-3)
             holderPos = y
             holder = holderList[holderPos]
-            for col in columns[::2]: # every column
+            for col in columns[::2]: # every other column
                 for row in rows:
                     dest = (row + str(col))
                     p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
@@ -118,5 +117,4 @@ def run(protocol: protocol_api.ProtocolContext):
                     p300.touch_tip()
                     p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
                     p300.move_to(holder[dest].bottom(40)) #move across holder in +4cm pos
-                p300.drop_tip()
-
+            p300.drop_tip()
