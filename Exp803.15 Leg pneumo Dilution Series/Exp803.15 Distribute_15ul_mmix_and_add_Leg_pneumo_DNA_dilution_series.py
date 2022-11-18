@@ -108,24 +108,24 @@ def run(protocol: protocol_api.ProtocolContext):
     std_locations = ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1','A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'H7', 'G7']
     # #### COMMANDS ######    
     # aspirate mmix to all wells in 96w plate; 15*96 = 1440ul*1.10=1584ul
-    h_list = tip_heightsEpp(1710, 96, 15)
-    well_num = 1
-    p20.pick_up_tip()
-    p20.mix(3, 20, LU_Mix.bottom(h_list[well_num-1]))
-    for row in rows: #8 rows
-        for col in range(1,13): #12 cols
-            dest = row+str(col)
-            p20.aspirate(15, LU_Mix.bottom(h_list[well_num-1]), rate=0.75)
-            protocol.delay(seconds=1) #head vol for more accurate pipetting
-            p20.move_to(LU_Mix.bottom(38))
-            protocol.delay(seconds=2) #equilibrate
-            p20.touch_tip(v_offset=-3, speed=30)
-            p20.dispense(15, pcr_plate[dest].bottom(1))
-            p20.blow_out(pcr_plate[dest].bottom(8))
-            protocol.delay(seconds=1) #equilibrate
-            p20.move_to(pcr_plate[dest].bottom(3)) # touch to remove fluid from tip
-            well_num += 1
-    p20.drop_tip()
+    # h_list = tip_heightsEpp(1710, 96, 15)
+    # well_num = 1
+    # p20.pick_up_tip()
+    # p20.mix(3, 20, LU_Mix.bottom(h_list[well_num-1]))
+    # for row in rows: #8 rows
+    #     for col in range(1,13): #12 cols
+    #         dest = row+str(col)
+    #         p20.aspirate(15, LU_Mix.bottom(h_list[well_num-1]), rate=0.75)
+    #         protocol.delay(seconds=1) #head vol for more accurate pipetting
+    #         p20.move_to(LU_Mix.bottom(38))
+    #         protocol.delay(seconds=2) #equilibrate
+    #         p20.touch_tip(v_offset=-3, speed=30)
+    #         p20.dispense(15, pcr_plate[dest].bottom(1))
+    #         p20.blow_out(pcr_plate[dest].bottom(8))
+    #         protocol.delay(seconds=1) #equilibrate
+    #         p20.move_to(pcr_plate[dest].bottom(3)) # touch to remove fluid from tip
+    #         well_num += 1
+    # p20.drop_tip()
 
     # add 5ul of Leg pneumo dilution series to each well in 96w plate 
     j = 0   
@@ -145,9 +145,9 @@ def run(protocol: protocol_api.ProtocolContext):
             dest1 = row+str(3*k+1+j)
             dest2 = row+str(3*k+2+j)
             dest3 = row+str(3*k+3+j)
-            p20.dispense(5, pcr_plate[dest1].bottom(1), rate=0.75)
-            p20.dispense(5, pcr_plate[dest2].bottom(1), rate=0.75)
-            p20.dispense(5, pcr_plate[dest3].bottom(1), rate=0.75)
+            p20.dispense(5, pcr_plate[dest1].bottom(6), rate=0.75)
+            p20.dispense(5, pcr_plate[dest2].bottom(6), rate=0.75)
+            p20.dispense(5, pcr_plate[dest3].bottom(6), rate=0.75)
             p20.drop_tip()
 
 # j     i    k    dest1    dest2    dest3
