@@ -92,6 +92,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # lists
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    cols = [1, 3, 5, 7, 9, 11]
     
     #### COMMANDS ######
     # turn on robot rail lights
@@ -112,7 +113,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
         p300.touch_tip(mmix, v_offset=-5, speed=20)
         for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
-            dest = stripTubes[rows[dispNo]+str(col+1)] # destination well
+            dest = stripTubes[rows[dispNo]+str(cols[col])] # destination well
             p300.move_to(dest.bottom(40)) # move to destination and pause for a few seconds to remove lateral motion
             # protocol.delay(seconds=1)
             p300.dispense(dispVol, dest.bottom(2), rate = 0.75) # want height to above parafilm, but not too high
