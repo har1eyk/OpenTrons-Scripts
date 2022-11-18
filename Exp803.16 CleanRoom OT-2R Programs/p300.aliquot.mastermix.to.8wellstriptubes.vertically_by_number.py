@@ -68,7 +68,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # LABWARE
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
 
-    tempDeckMmix = protocol.load_module('temperature module gen2', '1') 
+    tempDeckMmix = protocol.load_module('temperature module gen2', '4') 
     mixBlock = tempDeckMmix.load_labware('opentrons_24_aluminumblock_nest_2ml_snapcap')
     
     tempdeck = protocol.load_module('temperature module gen2', '1') 
