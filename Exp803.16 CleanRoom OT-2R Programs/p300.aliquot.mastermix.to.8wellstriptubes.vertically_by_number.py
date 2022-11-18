@@ -72,7 +72,7 @@ def run(protocol: protocol_api.ProtocolContext):
     mixBlock = tempDeckMmix.load_labware('opentrons_24_aluminumblock_nest_2ml_snapcap')
     
     tempdeck = protocol.load_module('temperature module gen2', '1') 
-    tubes = tempdeck.load_labware('opentrons_96_aluminumblock_generic_pcr_strip_200ul')
+    stripTubes = tempdeck.load_labware('opentrons_96_aluminumblock_generic_pcr_strip_200ul')
 
     # PIPETTES
     p300 = protocol.load_instrument(
@@ -81,39 +81,51 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     # mmx_rack  @ position 2
-    mastermix = mixBlock['A4']
+    mmix = mixBlock['A4']
 
   
     # USER INPUTS
     dispVol = 20 # this is the volume dispensed into each well min = 14.5, max = 20
     mmixVol = 1000 # this is the total volume in 2mL tube.
     # num_of_sample_reps is another way of stating number of strips
-    num_of_sample_reps_per_holder = 4 # can't exceed 6
+    dispNumberStripCaps = 4 # can't exceed 6
     
     # lists
-    columns = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-
-
-     #### COMMANDS ######
+    
+    #### COMMANDS ######
     # turn on robot rail lights
-    protocol.set_rail_lights(True) # turn on lights if not on 
-    # Add mastermix, distribute to strip tubes
-    for i, mixtube in enumerate(mixes):
-        for y in range(0, len(holderList)): 
-            p300.pick_up_tip()
-            p300.move_to(mixtube.bottom(40))
-            p300.aspirate(num_of_sample_reps_per_holder*20*1.10, mixtube.bottom(2)) # 6*20*1.08 = 130
-            protocol.delay(seconds=1) #equilibrate
-            p300.touch_tip(v_offset=-3)
-            holderPos = y
-            holder = holderList[holderPos]
-            for col in columns[::2]: # every other column
-                for row in rows:
-                    dest = (row + str(col))
-                    p300.move_to(holder[dest].bottom(40)) #move to holder in +4cm pos
-                    p300.dispense(20, holder[dest].bottom(6), rate=0.75) # more height so tip doesn't touch pellet
-                    p300.touch_tip()
-                    p300.move_to(holder[dest].top()) # centers tip so tip doesn't lift tubes after touch
-                    p300.move_to(holder[dest].bottom(40)) #move to holder in +4cm pos
-            p300.drop_tip()
+    protocol.set_rail_lights(True) # turn on lights if not on
+
+    p300.pick_up_tip()
+    mmixH = tip_heightsEpp(mmixVol, dispNumberStripCaps, dispVol*8) # each column gets dispensed 8x. each row goes to mix 3 times * 8 rows = 24 times
+    # prewetting step for tip
+    print (mmixH)
+    p300.mix(2, 200, mmix.bottom(mmixH[0])) # a pre-moistened tip is more accurate. 
+    i = 0 # height counter
+    for col in range(dispNumberStripCaps):# loops through sliced or all columns on plate
+        p300.aspirate(200, mmix.bottom(mmixH[i])) # could aspirate dispVol*10
+        p300.move_to(mmix.bottom(mmixH[i]+20))
+        protocol.delay(seconds=3)
+        p300.dispense(dispVol, mmix.bottom(mmixH[i]+20)) # dispense dispVol back into tube to improve volume accuracy in subsequent dispenses
+        protocol.delay(seconds=3) # tip for drops to coalesce
+        p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
+        p300.touch_tip(mmix, v_offset=-5, speed=20)
+        for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
+            dest = stripTubes[rows[dispNo]+str(col+1)] # destination well
+            p300.move_to(dest.bottom(40)) # move to destination and pause for a few seconds to remove lateral motion
+            # protocol.delay(seconds=1)
+            p300.dispense(dispVol, dest.bottom(2), rate = 0.75) # want height to above parafilm, but not too high
+            # protocol.delay(seconds=1)
+            p300.move_to(dest.bottom(5)) # residual fluid coalesces
+            protocol.delay(seconds=1)
+            p300.move_to(dest.bottom(3)) # remove excess fluid from tip
+            p300.move_to(dest.bottom(40)) # move to destination and pause for a few seconds to remove lateral motion
+        p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
+        p300.dispense((200-9*dispVol), mmix.bottom(mmixH[i]+10))
+        p300.blow_out(mmix.bottom(mmixH[i]+4))
+        p300.move_to(mmix.bottom(mmixH[i])) # touch tip to fluid to remove residual mmix on tubes
+        i+=1 # increment height counter
+    p300.drop_tip()
+
+ 
