@@ -141,7 +141,6 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.set_rail_lights(True) # turn on lights if not on
 
     p300.pick_up_tip()
-    contH = 2 # how many mm above tuberack height is the container height? 110mm is max.
     mmixH = tip_heightsEpp(mmixVol, dispNumberColumns, dispVol*8) # each column gets dispensed 8x. each row goes to mix 3 times * 8 rows = 24 times
     # prewetting step for tip
     print (mmixH)
@@ -157,13 +156,13 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.touch_tip(mmix, v_offset=-5, speed=20)
         for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
             dest = plate[rows[dispNo]+str(col+1)] # destination well
-            p300.move_to(dest.bottom(contH)) # move to destination and pause for a few seconds to remove lateral motion
+            p300.move_to(dest.bottom(40)) # move to destination and pause for a few seconds to remove lateral motion
             # protocol.delay(seconds=1)
-            p300.dispense(dispVol, dest.bottom(contH), rate = 0.75) # want height to above parafilm, but not too high
+            p300.dispense(dispVol, dest.bottom(2), rate = 0.75) # want height to above parafilm, but not too high
             # protocol.delay(seconds=1)
-            p300.move_to(dest.bottom(contH+3)) # residual fluid coalesces
+            p300.move_to(dest.bottom(10)) # residual fluid coalesces
             protocol.delay(seconds=1)
-            p300.move_to(dest.bottom(contH+1)) # remove excess fluid from tip
+            p300.move_to(dest.bottom(3)) # remove excess fluid from tip
         p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
         p300.dispense((200-9*dispVol), mmix.bottom(mmixH[i]+10))
         p300.blow_out(mmix.bottom(mmixH[i]+4))
