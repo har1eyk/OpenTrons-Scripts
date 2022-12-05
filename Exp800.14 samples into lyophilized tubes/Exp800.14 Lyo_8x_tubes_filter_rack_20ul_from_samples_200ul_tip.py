@@ -32,18 +32,18 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     # sds_rack  @ position 2
-    SAMP_1mix = stds_rack['A4'] # empty
-    SAMP_2mix = stds_rack['A5'] # empty
-    SAMP_3mix = stds_rack['A6'] # empty
-    SAMP_4mix = stds_rack['B1'] # empty
-    SAMP_5mix = stds_rack['B2'] # empty
-    SAMP_6mix = stds_rack['B3'] # empty
-    SAMP_7mix = stds_rack['B4'] # empty
-    SAMP_8mix = stds_rack['B5'] # empty
+    SAMP_1mix = stds_rack['A5'] # empty
+    SAMP_2mix = stds_rack['B4'] # empty
+    SAMP_3mix = stds_rack['A5'] # empty
+    SAMP_4mix = stds_rack['B4'] # empty
+    SAMP_5mix = stds_rack['A5'] # empty
+    SAMP_6mix = stds_rack['B4'] # empty
+    SAMP_7mix = stds_rack['A5'] # empty
+    SAMP_8mix = stds_rack['B4'] # empty
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
-    num_of_sample_reps_per_holder = 6 # can't exceed 6
+    num_of_sample_reps_per_holder = 4 # can't exceed 6
     # holderList = [holder_1, holder_2, holder_3, holder_4]
     holderList = [holder_1, holder_2]
     # holderList = [holder_1]
@@ -58,7 +58,10 @@ def run(protocol: protocol_api.ProtocolContext):
         for y in range(0, len(holderList)): #usually length 1 or 2
             p300.pick_up_tip()
             p300.move_to(mixtube.bottom(40))
-            p300.aspirate(num_of_sample_reps_per_holder*20*1.10, mixtube.bottom(2)) # 6*20*1.08 = 130
+            p300.mix(2, 200, mixtube.bottom(2)) # pre-wet tip for better accuracy
+            p300.aspirate((num_of_sample_reps_per_holder+1)*20*1.10, mixtube.bottom(2)) # 6*20*1.08 = 130, burn 1st dispense
+            p300.move_to(mixtube.bottom(30))
+            p300.dispense(20, mixtube.bottom(30)) # dispense 20ul into tube to increase accuracy. 
             protocol.delay(seconds=1) #equilibrate
             p300.touch_tip(v_offset=-3)
             holderPos = y
