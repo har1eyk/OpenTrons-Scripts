@@ -84,7 +84,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # )
     
     # in multiples of 16, not above 96
-    reaction_number = 32
+    reaction_number = 16
     
 
     # REAGENTS 
