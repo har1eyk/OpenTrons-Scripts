@@ -3,9 +3,9 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    'protocolName': 'Create Pos Control Dilution Series for qPCR.',
+    'protocolName': 'Create 15-tube Dilution Series with Std_0 (6e11).',
     'author': 'Harley King <harley.king@luminultra.com>',
-    'description': 'Create a 15-tube pos control dilution series on a 24-well rack. 900ul water also added.',
+    'description': 'Create a 15-tube pos control dilution series on a 24-well rack. 900ul water also added from 15mL tube.',
     'apiLevel': '2.12'
 }
 ##########################
@@ -75,7 +75,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # PIPETTES
     p300 = protocol.load_instrument(
-        'p300_single_gen2', 'left', tip_racks=[tiprack300]
+        'p300_single_gen2', 'right', tip_racks=[tiprack300]
     )
     # p20 = protocol.load_instrument(
     #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
@@ -110,6 +110,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     waterH = fifteen_ml_heights(15000, 76, 180) # 180*5=900, 15*5 = 75 total steps
     dispenseH = tip_heights(900, 5, 180)
+    p300.mix(200,2, water.bottom(waterH[0])) # pre-wet tip for more accurate dispenses at top water height.
     for i, stdTube in enumerate(std_wells):
         for h in range(1,6): #1 to 5
             p300.aspirate(180, water.bottom(waterH[5*i+h]))
