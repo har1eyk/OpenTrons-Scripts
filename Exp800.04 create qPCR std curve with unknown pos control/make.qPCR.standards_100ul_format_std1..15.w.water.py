@@ -137,6 +137,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.aspirate(100, std_wells[i].bottom(h_mix), rate=0.4)
         p300.touch_tip()
         p300.dispense(100, std_wells[i+1].bottom(14)) # better mixing with mid dispense
+        p300.mix(2, 100, std_wells[i+1].bottom(14)) # ensure tip is rinsed 
         p300.blow_out(std_wells[i+1].bottom(h_mix))# blow out just below the surface
         p300.drop_tip()
         if i==len(std_wells)-2: # last tube
