@@ -32,18 +32,18 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     # sds_rack  @ position 2
-    SAMP_1mix = stds_rack['A5'] # empty
-    SAMP_2mix = stds_rack['B4'] # empty
-    SAMP_3mix = stds_rack['A5'] # empty
-    SAMP_4mix = stds_rack['B4'] # empty
-    SAMP_5mix = stds_rack['A5'] # empty
-    SAMP_6mix = stds_rack['B4'] # empty
-    SAMP_7mix = stds_rack['A5'] # empty
-    SAMP_8mix = stds_rack['B4'] # empty
+    SAMP_1mix = stds_rack['A6'] # empty
+    SAMP_2mix = stds_rack['A6'] # empty
+    SAMP_3mix = stds_rack['A6'] # empty
+    SAMP_4mix = stds_rack['A6'] # empty
+    SAMP_5mix = stds_rack['A6'] # empty
+    SAMP_6mix = stds_rack['A6'] # empty
+    SAMP_7mix = stds_rack['A6'] # empty
+    SAMP_8mix = stds_rack['A6'] # empty
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
-    num_of_sample_reps_per_holder = 3 # can't exceed 6
+    num_of_sample_reps_per_holder = 4 # can't exceed 6
     # holderList = [holder_1, holder_2, holder_3, holder_4]
     holderList = [holder_1, holder_2]
     # holderList = [holder_1]
