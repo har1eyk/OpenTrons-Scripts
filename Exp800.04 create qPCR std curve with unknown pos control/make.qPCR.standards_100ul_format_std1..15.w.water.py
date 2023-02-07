@@ -75,7 +75,7 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # PIPETTES
     p300 = protocol.load_instrument(
-        'p300_single_gen2', 'right', tip_racks=[tiprack300]
+        'p300_single_gen2', 'left', tip_racks=[tiprack300]
     )
     # p20 = protocol.load_instrument(
     #     'p20_single_gen2', 'right', tip_racks=[tiprack20]
@@ -110,7 +110,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     waterH = fifteen_ml_heights(15000, 76, 180) # 180*5=900, 15*5 = 75 total steps
     dispenseH = tip_heights(900, 5, 180)
-    p300.mix(200,2, water.bottom(waterH[0])) # pre-wet tip for more accurate dispenses at top water height.
+    p300.mix(2,200, water.bottom(waterH[3])) # pre-wet tip for more accurate dispenses at top water height.
     for i, stdTube in enumerate(std_wells):
         for h in range(1,6): #1 to 5
             p300.aspirate(180, water.bottom(waterH[5*i+h]))
