@@ -8,5 +8,7 @@ def d_dispense(vol:int, steps:int, height:float):
     return zip(volArray, heightArray)
 
 # d_dispense(200, 20, 12)
-for volD, hD in d_dispense(200, 20, 12):
-    print (volD, hD)
+# for volD, hD in d_dispense(200, 20, 12):
+#     print (volD, hD)
+
+print ("Hello world")

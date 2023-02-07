@@ -1,29 +1,34 @@
 # all_fwd = ['first', 'second', 'third', 'four', 'five', 'six']
-plate_row = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-plate_col_group1 = ['1', '2', '3']
-plate_col_group2 = ['4', '5', '6']
-plate_col_group3 = ['7', '8', '9']
-plate_col_group4 = ['10', '11']
-plate_col_group5 = ['12']
+# plate_row = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+# plate_col_group1 = ['1', '2', '3']
+# plate_col_group2 = ['4', '5', '6']
+# plate_col_group3 = ['7', '8', '9']
+# plate_col_group4 = ['10', '11']
+# plate_col_group5 = ['12']
 
-plate_col_lists = [plate_col_group1, plate_col_group2, plate_col_group3, plate_col_group4, plate_col_group5]
+# plate_col_lists = [plate_col_group1, plate_col_group2, plate_col_group3, plate_col_group4, plate_col_group5]
 # plate_col_first_8 = ['1', '2', '3', '4', '5', '6', '7', '8']
+
+
+for i in range(1,49):
+    print (i%12)
+
 
 # opentrons needs format in 'A1', 'A2', 'A3'
 
 # print (plate_col_first_8[])
 
-for h in range(3): # loop through all the plate_col group lists
-    for i in range(8): # loop through the rows
-        print ("add tip")
-        for j in range(3): # loop through the wells, 3 wells per tip
-            # print (plate_row[i] + plate_col_first_8[i])
-            # source = deep well plate
-            sourceWell = plate_row[i] + plate_col_lists[h][j]
-            # dest = qPCR plate
-            destWell = plate_row[i] + plate_col_lists[h][j]
-            print ("transfer from " + sourceWell + " to " + destWell)
-        print ("Drop tip")
+# for h in range(3): # loop through all the plate_col group lists
+#     for i in range(8): # loop through the rows
+#         print ("add tip")
+#         for j in range(3): # loop through the wells, 3 wells per tip
+#             # print (plate_row[i] + plate_col_first_8[i])
+#             # source = deep well plate
+#             sourceWell = plate_row[i] + plate_col_lists[h][j]
+#             # dest = qPCR plate
+#             destWell = plate_row[i] + plate_col_lists[h][j]
+#             print ("transfer from " + sourceWell + " to " + destWell)
+#         print ("Drop tip")
 
 # for i in range(8):
 #     print ("add tip")
@@ -159,7 +164,7 @@ for h in range(3): # loop through all the plate_col group lists
 #         print ("std:", stdtube, "start:", start, "stop:", stop)
 #         print ("Aspirating from", source, "and dispensing into", holder, dest)
 
-rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+# rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
 # #### COMMANDS ######    
 # aspirate mmix to all wells in 96w plate; 15*96 = 1440ul*1.2=1728
