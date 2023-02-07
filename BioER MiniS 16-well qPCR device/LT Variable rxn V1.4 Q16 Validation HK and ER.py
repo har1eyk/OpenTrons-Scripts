@@ -7,7 +7,7 @@ metadata = {
     'protocolName': 'Standard Curve Validation v1.4 for Q16 Instruments',
     'author': 'Tim Carter, Harley King',
     'description': 'Creates 3 rep 5 point standard curves in increments of 16 samples.',
-    'apiLevel': '2.13'
+    'apiLevel': '2.12'
 }
 ##########################
 
@@ -71,7 +71,7 @@ def run(protocol: protocol_api.ProtocolContext):
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     water_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '3')
     holder_1 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '7')
-    holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '4')
+    # holder_2 = protocol.load_labware('8wstriptubesonfilterracks_96_aluminumblock_250ul', '4')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
  
 
@@ -112,10 +112,10 @@ def run(protocol: protocol_api.ProtocolContext):
    
 
     # LISTS
-    std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15]
+    # std_wells = [std_1, std_2, std_3, std_4, std_5, std_6, std_7, std_8, std_9, std_10, std_11, std_12, std_13, std_14, std_15]
     std_conc = [std_6, std_7, std_8, std_9, std_10]
-    cols = [1, 3, 5, 7, 9, 11]
-    rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+    # cols = [1, 3, 5, 7, 9, 11]
+    # rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     
     ###Tube Output###
     # example std_conc list [std_6, std_7, std_8, std_9, std_10]	
@@ -133,247 +133,71 @@ def run(protocol: protocol_api.ProtocolContext):
     #this will replicate each column individually when the number of reactions is increased
 
     # ### COMMANDS ######
-    # # Make std dilution series      
-    # # Make 10nM pos control, std_1
-    # p300.pick_up_tip()
-    waterH = fifteen_ml_heights(15000, 76 + (reaction_number/16), 180) # 180*5=900, 15*5 = 75 total steps + water for neg
-    dispenseH = tip_heights(900, 5, 180)
-    # for i, stdTube in enumerate(std_wells):
-    #     for h in range(1,6): #1 to 5
-    #         p300.aspirate(180, water.bottom(waterH[5*i+h]))
-    #         p300.dispense(180, stdTube.bottom(dispenseH[-h])) # want to reverse heights
-    # p300.drop_tip()
-
-    # # Make std dilution series      
-    # # Make 10nM pos control, std_1
-    # p300.transfer(
-    #     100,
-    #     pos_control.bottom(2), #1uM
-    #     std_1.bottom(20),
-    #     mix_after=(3, 200), # remove residual fluid from tip
-    #     touch_tip=True
-    # )
    
-    # # serial dilutions in microfuge tubes, 10% diliutions
-    # for i in range(len(std_wells)-1): 
-    #     h_mix = 20
-    #     p300.pick_up_tip()
-    #     p300.mix(2, 200, std_wells[i].bottom(8)) # mix low
-    #     p300.mix(2, 200, std_wells[i].bottom(14)) # mix mid
-    #     p300.mix(5, 200, std_wells[i].bottom(h_mix)) #mix hi
-    #     p300.aspirate(100, std_wells[i].bottom(h_mix), rate=0.4)
-    #     p300.touch_tip()
-    #     p300.dispense(100, std_wells[i+1].bottom(14)) # better mixing with mid dispense
-    #     p300.blow_out(std_wells[i+1].bottom(h_mix))# blow out just below the surface
-    #     p300.drop_tip()
-    #     if i==len(std_wells)-2: # last tube
-    #         p300.pick_up_tip()
-    #         p300.mix(2, 200, std_wells[i+1].bottom(8)) # mix low
-    #         p300.mix(2, 200, std_wells[i+1].bottom(14)) # mix mid
-    #         p300.mix(5, 200, std_wells[i+1].bottom(h_mix)) #mix hi
-    #         p300.blow_out(std_wells[i+1].bottom(h_mix))# blow out just below the surface
-    #         p300.drop_tip()
-
-
     std_conc.reverse() #reverses the list order so the lowest concetrations are used first
 
-    if reaction_number <= 48:
-        rxn_num = reaction_number
-        rxn_coeff = int(rxn_num/8)
-        vol = (rxn_coeff * 20) + ((rxn_coeff * 20)/5) 
-        # add water to bottom right
+    rxn_num = reaction_number
+    rxn_coeff = int(rxn_num/8)
+    vol = (rxn_coeff * 20) + ((rxn_coeff * 20)/5) 
+    # add water to bottom right
+    p300.pick_up_tip()
+    for row in rows[7:]:
+        p300.aspirate(int(vol/2), water.bottom(2)) # water level down by 15000-(76 + (reaction_number/16))* 180, but okay to do 2mm from bottom.
+        p300.touch_tip()
+        for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
+            p300.move_to(holder_1[row + str(col)].bottom(40))
+            p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
+            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
+        # p300.blow_out(waste.bottom(5))
+    p300.drop_tip()
+
+    # add last(first becuse list is reversed)dilution
+    count = 0
+    p300.pick_up_tip()
+    for row in rows[4:7]:
+        p300.aspirate(int(vol/2), std_conc[count])
+        p300.touch_tip()
+        for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
+            p300.move_to(holder_1[row + str(col)].bottom(40))
+            p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
+            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
+        # p300.blow_out(waste.bottom(3))
+        p300.touch_tip()
+    p300.drop_tip()
+
+    # add dil to top half of rows
+    count = 1 # keep track of standard 
+    for row in rows[:4]:
         p300.pick_up_tip()
-        for row in rows[7:]:
-            p300.aspirate(int(vol/2), water.bottom(2)) # water level down by 15000-(76 + (reaction_number/16))* 180, but okay to do 2mm from bottom.
+        p300.aspirate(vol, std_conc[count])
+        p300.touch_tip()
+        for col in cols[:rxn_coeff]:
+            p300.move_to(holder_1[row + str(col)].bottom(40))
+            p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(5))
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(20, waste.bottom(5))
+        #p300.blow_out(waste.bottom(5))
         p300.drop_tip()
+        count += 1 
 
-        # add last(first becuse list is reversed)dilution
-        count = 0
+    # add dil to bottom half of rows
+    count = 1
+    for row in rows[4:]:
         p300.pick_up_tip()
-        for row in rows[4:7]:
-            p300.aspirate(int(vol/2), std_conc[count])
+        p300.aspirate(int(vol/2), std_conc[count])
+        p300.touch_tip()
+        for col in cols[:int(rxn_coeff/2)]:
+            p300.move_to(holder_1[row + str(col)].bottom(40))
+            p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
             p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(3))
-            p300.touch_tip()
+            p300.move_to(holder_1[row + str(col)].top())
+        # p300.dispense(20, waste.bottom(5))
+        #p300.blow_out(waste.bottom(5))
         p300.drop_tip()
-
-        # add dil to top half of rows
-        count = 1 # keep track of standard 
-        for row in rows[:4]:
-            p300.pick_up_tip()
-            p300.aspirate(vol, std_conc[count])
-            p300.touch_tip()
-            for col in cols[:rxn_coeff]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-
-        # add dil to bottom half of rows
-        count = 1
-        for row in rows[4:]:
-            p300.pick_up_tip()
-            p300.aspirate(int(vol/2), std_conc[count])
-            p300.touch_tip()
-            for col in cols[:int(rxn_coeff/2)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-    # if reaction number is more than 48, fill 1st holder then mmove on to holder 2
-    else:
-        rxn_num = 48
-        rxn_coeff = int(rxn_num/8)
-        vol = (rxn_coeff * 20) + ((rxn_coeff * 20)/5) 
-        # add water to bottom right
-        p300.pick_up_tip()
-        for row in rows[7:]:
-            p300.aspirate(int(vol/2), water.bottom(waterH[5*i+h]))
-            p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(5))
-        p300.drop_tip()
-
-        # add last(first becuse list is reversed)dilution
-        count = 0
-        p300.pick_up_tip()
-        for row in rows[4:7]:
-            p300.aspirate(int(vol/2), std_conc[count])
-            p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(5))
-            p300.touch_tip()
-        p300.drop_tip()
-
-        # add dil to top half of rows
-        count = 1 # keep track of standard 
-        for row in rows[:4]:
-            p300.pick_up_tip()
-            p300.aspirate(vol, std_conc[count])
-            p300.touch_tip()
-            for col in cols[:rxn_coeff]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-
-        # add dil to bottom half of rows
-        count = 1
-        for row in rows[4:]:
-            p300.pick_up_tip()
-            p300.aspirate(int(vol/2), std_conc[count])
-            p300.touch_tip()
-            for col in cols[:int(rxn_coeff/2)]:
-                p300.move_to(holder_1[row + str(col)].bottom(40))
-                p300.dispense(20, holder_1[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_1[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-        
-        # repeat for holder 2 
-        rxn_num = reaction_number - 48
-        rxn_coeff = int(rxn_num/8)
-        vol = (rxn_coeff * 20) + ((rxn_coeff * 20)/5) 
-        # add water to bottom right
-        p300.pick_up_tip()
-        for row in rows[7:]:
-            p300.aspirate(int(vol/2), water.bottom(waterH[5*i+h]))
-            p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_2[row + str(col)].bottom(40))
-                p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_2[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(5))
-        p300.drop_tip()
-
-        # add last(first becuse list is reversed)dilution
-        count = 0
-        p300.pick_up_tip()
-        for row in rows[4:7]:
-            p300.aspirate(int(vol/2), std_conc[count])
-            p300.touch_tip()
-            for col in cols[int(rxn_coeff/2):int(rxn_coeff)]:
-                p300.move_to(holder_2[row + str(col)].bottom(40))
-                p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_2[row + str(col)].top())
-            # p300.dispense(int((rxn_coeff * 20)/10) , std_conc[count].bottom(5))
-            # p300.blow_out(waste.bottom(5))
-            p300.touch_tip()
-        p300.drop_tip()
-
-        # add dil to top half of rows
-        count = 1 # keep track of standard 
-        for row in rows[:4]:
-            p300.pick_up_tip()
-            p300.aspirate(vol, std_conc[count])
-            p300.touch_tip()
-            for col in cols[:rxn_coeff]:
-                p300.move_to(holder_2[row + str(col)].bottom(40))
-                p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_2[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-
-        # add dil to bottom half of rows
-        count = 1
-        for row in rows[4:]:
-            p300.pick_up_tip()
-            p300.aspirate(int(vol/2), std_conc[count])
-            p300.touch_tip()
-            for col in cols[:int(rxn_coeff/2)]:
-                p300.move_to(holder_2[row + str(col)].bottom(40))
-                p300.dispense(20, holder_2[row + str(col)].bottom(6), rate=0.75)
-                p300.touch_tip()
-                p300.move_to(holder_2[row + str(col)].top())
-            # p300.dispense(20, waste.bottom(5))
-            #p300.blow_out(waste.bottom(5))
-            p300.drop_tip()
-            count += 1 
-    
-    
-  
+        count += 1 
+   
