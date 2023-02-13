@@ -86,7 +86,7 @@ def run(protocol: protocol_api.ProtocolContext):
     FOligoAssayTwo=primers_rack['B1']
     ROligoAssayTwo=primers_rack['B2']
     FOligoAssayThree=primers_rack['C1']
-    RoligoAssayThree=primers_rack['C2']
+    ROligoAssayThree=primers_rack['C2']
 
     # CALCS
     mix_per_well = 18 #how much volume (ul) mastermix should be in each well?
@@ -97,7 +97,13 @@ def run(protocol: protocol_api.ProtocolContext):
     polyMixTubeListTwo = [ mmixTwoAssayOne, mmixTwoAssayTwo, mmixTwoAssayThree]
     polyMixTubeList = [polyMixTubeListOne, polyMixTubeListTwo]
     polyMixList = [polyMixOne, polyMixTwo]
-    primersList = [[FOligoAssayOne,ROligoAssayOne], [FOligoAssayTwo,ROligoAssayTwo], [FOligoAssayThree, RoligoAssayThree]]
+    mmixVol = 18*16*1.1 # the number of wells per assay per mastermix with 10% overage
+    primersList = [[FOligoAssayOne,ROligoAssayOne], [FOligoAssayTwo,ROligoAssayTwo], [FOligoAssayThree, ROligoAssayThree]]
+    assayOnePrimerConc = 300 # what is the conc in nM of F, R primers?
+    assayTwoPrimerConc = 300 
+    assayThreePrimerConc = 300 
+    primerSourceConc = 100 #100uM
+    primersConc = [assayOnePrimerConc, assayTwoPrimerConc, assayThreePrimerConc]
 
     #### COMMANDS ######
     # PROGRAM OUTLINE #
@@ -113,12 +119,25 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(3):
             dest = polyMixTubeList[i][j]
             for j in range(2):
-                p300.aspirate(18*16*1.1/2, polyMix)  # 18*16*1.1 = 316.8/2 = 158.4
-                p300.dispense(18*16*1.1/2, dest.bottom(2+6*j))
+                p300.aspirate(mmixVol/2, polyMix)  # 18*16*1.1 = 316.8/2 = 158.4
+                p300.dispense(mmixVol/2, dest.bottom(2+6*j))
         p300.drop_tip()
 
     # 1.2 Two primers are added to generate 6 mmixes
-
+    for m, (primers, nMConc) in enumerate(zip(primersList, primersConc)):
+        p20.pick_up_tip()
+        volume = 20*(nMConc/1000)/100*(16*1.1)*2 # amount F primer in mmix * 2 for 2 mixes + 4 as a bolus
+        p20.aspirate(volume+2, primers[0]) # F primer with 2 ul bolus
+        p20.dispense(volume/2, polyMixTubeList[0][m]) # dispense in mmixOneAssayOne and mmixTwoAssayOne
+        p20.dispense(volume/2, polyMixTubeList[1][m])
+        p20.drop_tip()
+        p20.pick_up_tip()
+        volume = 20*(nMConc/1000)/100*(16*1.1)*2 # amount F primer in mmix * 2 for 2 mixes + 4 as a bolus
+        p20.aspirate(volume+2, primers[1]) # F primer with 2 ul bolus
+        p20.dispense(volume/2, polyMixTubeList[0][m]) # dispense in mmixOneAssayOne and mmixTwoAssayOne
+        p20.dispense(volume/2, polyMixTubeList[1][m])
+        p20.drop_tip()
+        # print (m, primers)
 
     # for i, polyMix in enumerate(polyMixList):
     #     for j in range(0,6):
