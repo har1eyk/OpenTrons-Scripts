@@ -42,7 +42,7 @@ def tip_heights(init_vol, steps, vol_dec):
         vols.append(x)
         h = p5*x**5+p4*x**4+p3*x**3+p2*x**2+p1*x**1 + p0
         h = h-offset
-        if h < 8: # prevent negative heights; go to bottom to avoid air aspirant above certain height
+        if h < 3: # prevent negative heights; go to bottom to avoid air aspirant above certain height
             h = 1
             heights.append(h)
         else:
@@ -123,7 +123,6 @@ def run(protocol: protocol_api.ProtocolContext):
     primersList = [[FOligoAssayOne,ROligoAssayOne], [FOligoAssayTwo,ROligoAssayTwo]]
     assayOnePrimerConc = 300 # what is the conc in nM of F, R primers?
     assayTwoPrimerConc = 300 
-    primerSourceConc = 100 #100uM
     primersConc = [assayOnePrimerConc, assayTwoPrimerConc]
     oneStds = [stdOne_1, stdOne_2, stdOne_3, stdOne_4, stdOne_5, stdOne_6, stdOne_7, stdOne_8]
     twoStds = [stdTwo_1, stdTwo_2, stdTwo_3, stdTwo_4, stdTwo_5, stdTwo_6, stdTwo_7, stdTwo_8]
@@ -144,23 +143,27 @@ def run(protocol: protocol_api.ProtocolContext):
         for j in range(2):
             dest = polyMixTubeList[i][j] # i = 3, len(polyMixList), j = 2, # of tubes
             for j in range(2):
-                p300.aspirate(mmixVol/2, polyMix)  # 18*16*1.125 = 316.8/2 = 158.4
+                p300.aspirate(mmixVol/2, polyMix.bottom(2), rate=0.6)  # 18*16*1.125 = 316.8/2 = 158.4
+                p300.move_to(polyMix.top(-3))
+                protocol.delay(seconds=2)
+                p300.touch_tip(polyMix, v_offset=-3, speed=40)
                 p300.dispense(mmixVol/2, dest.bottom(2+6*j))
         p300.drop_tip()
 
     # 1.2 Two primers are added to generate 6 mmixes
+    # the primers are the IDT tubes. Tip doesn't reach bottom, may need some exploring here if liquid level becomes low, or move to 1.5mL tubes? 230215 hjk
     for m, (primers, nMConc) in enumerate(zip(primersList, primersConc)): # 2 sets of primers
         p20.pick_up_tip()
         
-        volume = 20*(nMConc/1000)/100*(16*1.1)*3 # amount F primer in mmix * 3 for 3 mixes 
-        p20.aspirate(volume+2, primers[0]) # F primer with 2 ul bolus
+        volume = 20*(nMConc/1000)/100*(16*1.125)*3 # amount F primer in mmix * 3 for 3 mixes 
+        p20.aspirate(volume+2, primers[0].bottom(1)) # F primer with 2 ul bolus
         p20.dispense(volume/3, polyMixTubeList[0][m].bottom(4)) # dispense in mmixOneAssayOne and mmixTwoAssayOne, mmixThreeAssayOne
         p20.dispense(volume/3, polyMixTubeList[1][m].bottom(4)) # dispense in middle of volume
         p20.dispense(volume/3, polyMixTubeList[2][m].bottom(4))
         p20.drop_tip()
         p20.pick_up_tip()
-        volume = 20*(nMConc/1000)/100*(16*1.1)*3 # amount F primer in mmix * 2 for 2 mixes + 4 as a bolus
-        p20.aspirate(volume+2, primers[1]) # F primer with 2 ul bolus
+        volume = 20*(nMConc/1000)/100*(16*1.125)*3 # amount F primer in mmix * 2 for 2 mixes + 4 as a bolus
+        p20.aspirate(volume+2, primers[1].bottom(1)) # F primer with 2 ul bolus
         p20.dispense(volume/3, polyMixTubeList[0][m].bottom(4)) # dispense in mmixOneAssayOne and mmixTwoAssayOne
         p20.dispense(volume/3, polyMixTubeList[1][m].bottom(4))
         p20.dispense(volume/3, polyMixTubeList[2][m].bottom(4))
@@ -169,7 +172,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # 1.3 Mix and aliquot to wells
     for q, mmixTubes in enumerate(polyMixTubeList): # 3 mastermix types
         for r, mmixTube in enumerate(mmixTubes): # 2 mastermix assay tubes
-            mmixH = tip_heights(18*16*1.1, 8, 36) # 316.8ul) #18*16*1.1 # 316.8ul
+            mmixH = tip_heights(18*16*1.125, 8, 36) # 316.8ul) #18*16*1.1 # 316.8ul
             print ("mmixH:", mmixH)
             for n in range(8):
                 p300.pick_up_tip()
