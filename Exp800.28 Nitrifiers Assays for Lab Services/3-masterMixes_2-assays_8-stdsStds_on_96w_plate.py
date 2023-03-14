@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Compare Three MasterMixes with Two Assays and Eight Standards in 96w Plate',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': '18ul mix is dispensed with 2ul stds from two mastermixes in two assays using eight standards. Which mmix is better?',
-    'apiLevel': '2.12'
+    'apiLevel': '2.13'
 }
 ##########################
 # functions
@@ -71,7 +71,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 
     # mix_rack
-    polyMixOne = mix_rack['A1'] # 18*32*(1.2) = 691.2 µl, should include primers
+    polyMixOne = mix_rack['A1'] # 18*32*(1.2) = 691.2 µl, should not include primers
     polyMixTwo = mix_rack['A3'] # 691.2ul
     polyMixThree = mix_rack['A6'] # 691.2ul
     
