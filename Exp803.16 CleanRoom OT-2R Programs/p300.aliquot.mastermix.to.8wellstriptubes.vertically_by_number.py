@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Dispense mastermix in 8-well strips using strip-cap tubes number.',
     'author': 'Ally',
     'description': 'Add mastermix samples to 8-well strip tubes. Tubes are held by temp module.',
-    'apiLevel': '2.12'
+    'apiLevel': '2.13'
 }
 
 # def which_holder (plate, samp, dest):
@@ -66,7 +66,8 @@ def tip_heightsEpp(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
+    # tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
+    tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '7')
 
     tempDeckMmix = protocol.load_module('temperature module gen2', '4') 
     mixBlock = tempDeckMmix.load_labware('opentrons_24_aluminumblock_nest_2ml_snapcap')
