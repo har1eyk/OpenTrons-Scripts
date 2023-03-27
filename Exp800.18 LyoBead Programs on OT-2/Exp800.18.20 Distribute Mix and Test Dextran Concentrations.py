@@ -159,8 +159,9 @@ def run(protocol: protocol_api.ProtocolContext):
     h_list = tip_heights(1584, 12, 117.6)
     p300.pick_up_tip()
     p300.mix(3, 200, LU_Mix.bottom(h_list[0]))
-    for tube in conds:
-        p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[0]), rate=0.75) # 8*14*excess = 117.6ul
+    for h, tube in enumerate(conds):
+        print ("tip height in tube is:", h_list[h])
+        p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[h]), rate=0.75) # 8*14*excess = 117.6ul
         p300.touch_tip(v_offset=-3, speed=30)
         p300.dispense(8*14*excess, tube.bottom(1))
         p300.blow_out(tube.bottom(tip_heights(8*14*excess,1,1)[0]))
@@ -176,6 +177,7 @@ def run(protocol: protocol_api.ProtocolContext):
         if dVol < 20:
             p20.pick_up_tip()
             p20.mix(1, 20, dextran.bottom(h))
+            print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p20.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p20.touch_tip(v_offset=-3, speed=30)
             p20.dispense(dVol, tube.bottom(4))
@@ -184,13 +186,14 @@ def run(protocol: protocol_api.ProtocolContext):
         else: 
             p300.pick_up_tip()
             p300.mix(1, 200, dextran.bottom(h))
+            print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p300.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(dVol, tube.bottom(4))
             p300.blow_out(tube.bottom(tip_heights(14*8*excess+dVol,1,1)[0]))
             p300.drop_tip()
     
-    # 1.3 Add 2[0-(14-Dextran)]*excess to condition tube on alum block
+    # 1.3 Add 2[0-(14-Dextran)]*excess NFW to condition tube on alum block
     waterVolsTube = [vol*8*excess for vol in waterVols] # water volumes in tubes
     print ("waterVolsTube: ", waterVolsTube)
     w_heights= fifty_ml_heights(water_beg_vol, 12, int(sum(waterVolsTube)/len(waterVolsTube)) ) # average dextran volume per tube
@@ -200,6 +203,7 @@ def run(protocol: protocol_api.ProtocolContext):
         if wVol < 20:
             p20.pick_up_tip()
             p20.mix(1, 20, water.bottom(h))
+            print ("p20 pipette tip height in water addition to tubes is: ", h)
             p20.aspirate(wVol, water.bottom(h), rate=0.5)
             # p20.touch_tip(v_offset=-3, speed=30) # don't need to touch off water, no beads
             p20.dispense(wVol, tube.bottom(4))
@@ -208,6 +212,7 @@ def run(protocol: protocol_api.ProtocolContext):
         else: 
             p300.pick_up_tip()
             p300.mix(1, 200, water.bottom(h))
+            print ("p20 pipette tip height in water addition to tubes is: ", h)
             p300.aspirate(wVol, water.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(wVol, tube.bottom(4))
@@ -216,7 +221,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # 1.4 mix condition tubes on alum block and aliquot to PCR plate
     p300.pick_up_tip()
-    for col, tube in enumerate(conds):
+    for col, tube in enumerate(conds): #col is a number, tube is a well
         tube_height = tip_heights(168, 8, 20)
         p20.pick_up_tip()
         p300.mix(2, 150, tube.bottom(2)) # tube total volume = 168
@@ -224,6 +229,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.touch_tip(v_offset=-3, speed=30)
         for i, row in enumerate(rows):
             p20.aspirate(20, tube.bottom(tube_height[i]), rate=0.75)
+            # print ("in 1.4, tip height is: ", tube_height[i])
             dest = row+str(col+1) 
             p20.dispense(20, plate[dest].bottom(2))
         p20.drop_tip()
