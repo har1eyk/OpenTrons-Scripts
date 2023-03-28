@@ -105,8 +105,9 @@ def run(protocol: protocol_api.ProtocolContext):
     # tempdeckTwo = protocol.load_module('tempdeck', '7')
     # alumBlock = tempdeckTwo.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
     alumBlock = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '3')
+    reagent_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '2')
 
-    reagent_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '2')
+    # reagent_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '2')
 
     # PIPETTES
     p20 = protocol.load_instrument(
@@ -131,10 +132,9 @@ def run(protocol: protocol_api.ProtocolContext):
     cond_11 = alumBlock['B5']  # empty
     cond_12 = alumBlock['B6']  # empty
           
-    LU_Mix = alumBlock['D1'] # LU MasterMix; 14*96*1.10 = 1584ul
-
-    dextran = reagent_rack['A3'] # 50mL tube with dextran
-    water = reagent_rack['A4'] # 50mL tube with water
+    LU_Mix = reagent_rack['D1'] # LU MasterMix; 14*96*1.10 = 1478.4ul
+    dextran = reagent_rack['A1'] # 1.5mL tube with dextran, 1000uL Sum of dextran ~ 323.4ul
+    water = reagent_rack['A6'] # 1.5mL tube with water, 1000uL
     
     # USER INPUT
     dextran_beg_vol= 700 # dextran volume in ul
@@ -172,7 +172,7 @@ def run(protocol: protocol_api.ProtocolContext):
     dextranVolsTube = [vol*excess*8 for vol in dextranVols] # dextran volumes in 20ul rxn. 4/20 at 25% = 5% dextran, current concentration in mastermixes
     # print ("dextranVolsTube: ", dextranVolsTube)
     print ("sum(dextranVolsTube): ", sum(dextranVolsTube))
-    d_heights= fifty_ml_heights(dextran_beg_vol, 12, int(sum(dextranVolsTube)/len(dextranVolsTube)) ) # average dextran volume per tube
+    d_heights= tip_heights(dextran_beg_vol, 12, int(sum(dextranVolsTube)/len(dextranVolsTube)) ) # average dextran volume per tube
     for dVol, tube, h in zip(dextranVolsTube, conds, d_heights):
         if dVol < 0.01: # OT-2 logic needs this because if aspirate vol = 0 then default will be 20ul. 
             continue
@@ -198,7 +198,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # 1.3 Add 2[0-(14-Dextran)]*excess NFW to condition tube on alum block
     waterVolsTube = [vol*8*excess for vol in waterVols] # water volumes in tubes
     # print ("waterVolsTube: ", waterVolsTube)
-    w_heights= fifty_ml_heights(water_beg_vol, 12, int(sum(waterVolsTube)/len(waterVolsTube)) ) # average dextran volume per tube
+    w_heights= tip_heights(water_beg_vol, 12, int(sum(waterVolsTube)/len(waterVolsTube)) ) # average dextran volume per tube
     for wVol, tube, h in zip(waterVolsTube, conds, w_heights):
         if wVol < 0.01: # OT-2 logic needs this because if aspirate vol = 0 then default will be 20ul.
             continue
