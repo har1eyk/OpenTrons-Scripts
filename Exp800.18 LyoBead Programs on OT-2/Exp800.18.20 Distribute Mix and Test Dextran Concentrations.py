@@ -136,8 +136,8 @@ def run(protocol: protocol_api.ProtocolContext):
     water = reagent_rack['A4'] # 50mL tube with water
     
     # USER INPUT
-    dextran_beg_vol= 700 # dextran volume in ul
-    water_beg_vol = 700 # water volume in ul
+    dextran_beg_vol= 1000 # dextran volume in ul
+    water_beg_vol = 1000 # water volume in ul
 
     # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
