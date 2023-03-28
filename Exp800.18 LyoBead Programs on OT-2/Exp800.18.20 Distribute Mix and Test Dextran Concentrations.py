@@ -102,10 +102,12 @@ def run(protocol: protocol_api.ProtocolContext):
     # pcr_plate = tempdeck.load_labware('bioer_96_aluminumblock_200ul.json')
     plate = tempdeck.load_labware('bioer_96_aluminumblock_200ul')
     
-    tempdeckTwo = protocol.load_module('tempdeck', '7')
-    alumBlock = tempdeckTwo.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
+    # tempdeckTwo = protocol.load_module('tempdeck', '7')
+    # alumBlock = tempdeckTwo.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
+    alumBlock = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '3')
+    reagent_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '2')
 
-    reagent_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '11')
+    # reagent_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '2')
 
     # PIPETTES
     p20 = protocol.load_instrument(
@@ -130,10 +132,9 @@ def run(protocol: protocol_api.ProtocolContext):
     cond_11 = alumBlock['B5']  # empty
     cond_12 = alumBlock['B6']  # empty
           
-    LU_Mix = alumBlock['D1'] # LU MasterMix; 14*96*1.10 = 1584ul
-
-    dextran = reagent_rack['A3'] # 50mL tube with dextran
-    water = reagent_rack['A4'] # 50mL tube with water
+    LU_Mix = reagent_rack['D1'] # LU MasterMix; 14*96*1.10 = 1478.4ul
+    dextran = reagent_rack['A1'] # 1.5mL tube with dextran, 1000uL Sum of dextran ~ 323.4ul
+    water = reagent_rack['A6'] # 1.5mL tube with water, 1000uL
     
     # USER INPUT
     dextran_beg_vol= 1000 # dextran volume in ul
@@ -160,7 +161,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     p300.mix(3, 200, LU_Mix.bottom(h_list[0]))
     for h, tube in enumerate(conds):
-        print ("tip height in tube is:", h_list[h])
+        # print ("tip height in tube is:", h_list[h])
         p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[h]), rate=0.75) # 8*14*excess = 117.6ul
         p300.touch_tip(v_offset=-3, speed=30)
         p300.dispense(8*14*excess, tube.bottom(1))
@@ -169,15 +170,16 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # 1.2 Add Dextran*14*8*excess to condition tube on alum block
     dextranVolsTube = [vol*excess*8 for vol in dextranVols] # dextran volumes in 20ul rxn. 4/20 at 25% = 5% dextran, current concentration in mastermixes
-    print ("dextranVolsTube: ", dextranVolsTube)
-    d_heights= fifty_ml_heights(dextran_beg_vol, 12, int(sum(dextranVolsTube)/len(dextranVolsTube)) ) # average dextran volume per tube
+    # print ("dextranVolsTube: ", dextranVolsTube)
+    print ("sum(dextranVolsTube): ", sum(dextranVolsTube))
+    d_heights= tip_heights(dextran_beg_vol, 12, int(sum(dextranVolsTube)/len(dextranVolsTube)) ) # average dextran volume per tube
     for dVol, tube, h in zip(dextranVolsTube, conds, d_heights):
         if dVol < 0.01: # OT-2 logic needs this because if aspirate vol = 0 then default will be 20ul. 
             continue
         if dVol < 20:
             p20.pick_up_tip()
             p20.mix(1, 20, dextran.bottom(h))
-            print ("p20 pipette tip height in dextran addition to tubes is: ", h)
+            # print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p20.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p20.touch_tip(v_offset=-3, speed=30)
             p20.dispense(dVol, tube.bottom(4))
@@ -186,7 +188,7 @@ def run(protocol: protocol_api.ProtocolContext):
         else: 
             p300.pick_up_tip()
             p300.mix(1, 200, dextran.bottom(h))
-            print ("p20 pipette tip height in dextran addition to tubes is: ", h)
+            # print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p300.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(dVol, tube.bottom(4))
@@ -195,15 +197,15 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # 1.3 Add 2[0-(14-Dextran)]*excess NFW to condition tube on alum block
     waterVolsTube = [vol*8*excess for vol in waterVols] # water volumes in tubes
-    print ("waterVolsTube: ", waterVolsTube)
-    w_heights= fifty_ml_heights(water_beg_vol, 12, int(sum(waterVolsTube)/len(waterVolsTube)) ) # average dextran volume per tube
+    # print ("waterVolsTube: ", waterVolsTube)
+    w_heights= tip_heights(water_beg_vol, 12, int(sum(waterVolsTube)/len(waterVolsTube)) ) # average dextran volume per tube
     for wVol, tube, h in zip(waterVolsTube, conds, w_heights):
         if wVol < 0.01: # OT-2 logic needs this because if aspirate vol = 0 then default will be 20ul.
             continue
         if wVol < 20:
             p20.pick_up_tip()
             p20.mix(1, 20, water.bottom(h))
-            print ("p20 pipette tip height in water addition to tubes is: ", h)
+            # print ("p20 pipette tip height in water addition to tubes is: ", h)
             p20.aspirate(wVol, water.bottom(h), rate=0.5)
             # p20.touch_tip(v_offset=-3, speed=30) # don't need to touch off water, no beads
             p20.dispense(wVol, tube.bottom(4))
@@ -212,7 +214,7 @@ def run(protocol: protocol_api.ProtocolContext):
         else: 
             p300.pick_up_tip()
             p300.mix(1, 200, water.bottom(h))
-            print ("p20 pipette tip height in water addition to tubes is: ", h)
+            # print ("p20 pipette tip height in water addition to tubes is: ", h)
             p300.aspirate(wVol, water.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(wVol, tube.bottom(4))
