@@ -104,8 +104,8 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # tempdeckTwo = protocol.load_module('tempdeck', '7')
     # alumBlock = tempdeckTwo.load_labware('opentrons_24_aluminumblock_nest_1.5ml_snapcap')
-    alumBlock = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '3')
-    reagent_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '2')
+    alumBlock = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '2')
+    reagent_rack = protocol.load_labware('opentrons_24_tuberack_nest_1.5ml_snapcap', '3')
 
     # reagent_rack = protocol.load_labware('opentrons_10_tuberack_nest_4x50ml_6x15ml_conical', '2')
 
@@ -137,8 +137,8 @@ def run(protocol: protocol_api.ProtocolContext):
     water = reagent_rack['A6'] # 1.5mL tube with water, 1000uL
     
     # USER INPUT
-    dextran_beg_vol= 700 # dextran volume in ul
-    water_beg_vol = 700 # water volume in ul
+    dextran_beg_vol= 1000 # dextran volume in ul
+    water_beg_vol = 1000 # water volume in ul
 
     # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -165,7 +165,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[h]), rate=0.75) # 8*14*excess = 117.6ul
         p300.touch_tip(v_offset=-3, speed=30)
         p300.dispense(8*14*excess, tube.bottom(1))
-        p300.blow_out(tube.bottom(tip_heights(8*14*excess,1,1)[0]))
+        p300.blow_out(tube.bottom(8))
     p300.drop_tip()
 
     # 1.2 Add Dextran*14*8*excess to condition tube on alum block
@@ -178,21 +178,21 @@ def run(protocol: protocol_api.ProtocolContext):
             continue
         if dVol < 20:
             p20.pick_up_tip()
-            p20.mix(1, 20, dextran.bottom(h))
+            p20.mix(1, 20, dextran.bottom(h)) #pre-moisten helps with accurate dispensing
             # print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p20.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p20.touch_tip(v_offset=-3, speed=30)
             p20.dispense(dVol, tube.bottom(4))
-            p20.blow_out(tube.bottom(tip_heights(14*8*excess+dVol,1,1)[0]))
+            p20.blow_out(tube.bottom(8))
             p20.drop_tip()
         else: 
             p300.pick_up_tip()
-            p300.mix(1, 200, dextran.bottom(h))
+            p300.mix(1, 200, dextran.bottom(h)) #pre-moisten helps with accurate dispensing
             # print ("p20 pipette tip height in dextran addition to tubes is: ", h)
             p300.aspirate(dVol, dextran.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(dVol, tube.bottom(4))
-            p300.blow_out(tube.bottom(tip_heights(14*8*excess+dVol,1,1)[0]))
+            p300.blow_out(tube.bottom(8))
             p300.drop_tip()
     
     # 1.3 Add 2[0-(14-Dextran)]*excess NFW to condition tube on alum block
@@ -209,7 +209,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.aspirate(wVol, water.bottom(h), rate=0.5)
             # p20.touch_tip(v_offset=-3, speed=30) # don't need to touch off water, no beads
             p20.dispense(wVol, tube.bottom(4))
-            p20.blow_out(tube.bottom(tip_heights(14*8*excess+wVol,1,1)[0]))
+            p20.blow_out(tube.bottom(8))
             p20.drop_tip()
         else: 
             p300.pick_up_tip()
@@ -218,7 +218,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.aspirate(wVol, water.bottom(h), rate=0.5)
             p300.touch_tip(v_offset=-3, speed=30)
             p300.dispense(wVol, tube.bottom(4))
-            p300.blow_out(tube.bottom(tip_heights(14*8*excess+wVol,1,1)[0]))
+            p300.blow_out(tube.bottom(8))
             p300.drop_tip()
 
     # 1.4 mix condition tubes on alum block and aliquot to PCR plate
@@ -227,7 +227,7 @@ def run(protocol: protocol_api.ProtocolContext):
         tube_height = tip_heights(168, 8, 20)
         p20.pick_up_tip()
         p300.mix(2, 150, tube.bottom(2)) # tube total volume = 168
-        p300.blow_out(tube.bottom(tube_height[0]))
+        p300.blow_out(tube.bottom(8))
         p300.touch_tip(v_offset=-3, speed=30)
         for i, row in enumerate(rows):
             p20.aspirate(20, tube.bottom(tube_height[i]), rate=0.75)
