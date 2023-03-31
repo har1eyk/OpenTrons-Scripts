@@ -50,13 +50,13 @@ def tip_heights(init_vol, steps, vol_dec):
     if init_vol > 1500:
         offset = 14 # model out of range; see sheet
     else:
-        offset = 7 #mm Need to add offset to ensure tip reaches below liquid level
+        offset = 5 #mm Need to add offset to ensure tip reaches below liquid level
     for i in range(steps):
         x = init_vol-vol_dec*i
         vols.append(x)
         h = p5*x**5+p4*x**4+p3*x**3+p2*x**2+p1*x**1 + p0
         h = h-offset
-        if h < 8: # prevent negative heights; go to bottom to avoid air aspirant above certain height
+        if h < 7: # prevent negative heights; go to bottom to avoid air aspirant above certain height
             h = 1        
             heights.append(h)
         else:
@@ -143,7 +143,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # LISTS
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
     conds = [cond_1, cond_2, cond_3, cond_4, cond_5, cond_6, cond_7, cond_8, cond_9, cond_10, cond_11, cond_12]
-    excess = 1.05
+    excess = 1.08
     # disp_locs = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12'] #DISPENSE LOCATIONS ON PCR PLATE
     dextranVols =[0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6] # dextran volumes in 20ul rxn. 4/20 at 25% = 5% dextran, current concentration in mastermixes
     waterVols= [20-14-vol for vol in dextranVols] #  
@@ -173,6 +173,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # print ("dextranVolsTube: ", dextranVolsTube)
     print ("sum(dextranVolsTube): ", sum(dextranVolsTube))
     d_heights= tip_heights(dextran_beg_vol, 12, int(sum(dextranVolsTube)/len(dextranVolsTube)) ) # average dextran volume per tube
+    print ("Dextran volume heights:", d_heights)
     for dVol, tube, h in zip(dextranVolsTube, conds, d_heights):
         if dVol < 0.01: # OT-2 logic needs this because if aspirate vol = 0 then default will be 20ul. 
             continue
