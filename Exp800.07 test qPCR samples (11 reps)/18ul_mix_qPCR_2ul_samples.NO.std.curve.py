@@ -6,7 +6,7 @@ metadata = {
     'protocolName': 'Add 18ul Mix and 2ul Sample to Test LOD Using Opt Fwd and Rev and Prove Concentrations. No std curve.',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': 'Creates a 96w plate of optimal primer and probe concentrations to qPCR samples. No std curve is created.',
-    'apiLevel': '2.12'
+    'apiLevel': '2.14'
 }
 ##########################
 # functions
@@ -101,13 +101,13 @@ def run(protocol: protocol_api.ProtocolContext):
        
     #fuge_rack
     samp_1 = fuge_rack['B1'] # e.g. 0.625uM # empty
-    samp_2 = fuge_rack['B2'] # e.g. 1.25uM # empty
-    samp_3 = fuge_rack['D1'] # e.g. 2.5uM # empty
-    samp_4 = fuge_rack['D2'] # e.g. 5.0uM # empty
-    samp_5 = fuge_rack['D3'] # e.g. 7.5uM # empty
-    samp_6 = fuge_rack['D4'] # e.g. 10uM # empty
-    samp_7 = fuge_rack['D5'] # e.g. 10uM # empty
-    samp_8 = fuge_rack['B3'] # e.g. 10uM # empty
+    samp_2 = fuge_rack['B1'] # e.g. 1.25uM # empty
+    samp_3 = fuge_rack['B1'] # e.g. 2.5uM # empty
+    samp_4 = fuge_rack['B1'] # e.g. 5.0uM # empty
+    samp_5 = fuge_rack['B2'] # e.g. 7.5uM # empty
+    samp_6 = fuge_rack['B2'] # e.g. 10uM # empty
+    samp_7 = fuge_rack['B2'] # e.g. 10uM # empty
+    samp_8 = fuge_rack['B2'] # e.g. 10uM # empty
     
     # user inputs
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -128,7 +128,7 @@ def run(protocol: protocol_api.ProtocolContext):
             p20.aspirate(18, mmix.bottom(tubeH[h_counter]))
             protocol.delay(seconds=1) #equilibrate
             # p20.move_to(mmix.bottom(tubeH[h_counter]+10)) # suspend above mix; droplets coalesce
-            p20.move_to(mmix.center(4)) # suspend above mix; droplets coalesce
+            p20.move_to(mmix.top(-4)) # suspend above mix; droplets coalesce
             protocol.delay(seconds=2)
             p20.touch_tip(v_offset=-4, speed=40)
             # p20.move_to(mmix.bottom(tubeH[h_counter])) # remove fluid my dipping in mix

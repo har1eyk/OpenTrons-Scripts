@@ -3,10 +3,10 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    'protocolName': 'Select Tubes for qPCR Dilution Series Using Lyophilized Samples in 8-well strips.',
     'author': 'Harley King <harley.king@luminultra.com>',
+    'protocolName': 'Add 20µl to Lyophilized qPCR 8-well Strip Tubes.',
     'description': 'Add DNA samples to lyophilized 8-well strip tubes. Tubes are held by 200 filter tip racks.',
-    'apiLevel': '2.12'
+    'apiLevel': '2.14'
 }
 
 # def which_holder (plate, samp, dest):
@@ -32,18 +32,18 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # REAGENTS   
     # sds_rack  @ position 2
-    SAMP_1mix = stds_rack['A6'] # empty
-    SAMP_2mix = stds_rack['A6'] # empty
-    SAMP_3mix = stds_rack['A6'] # empty
-    SAMP_4mix = stds_rack['A6'] # empty
-    SAMP_5mix = stds_rack['A6'] # empty
-    SAMP_6mix = stds_rack['A6'] # empty
-    SAMP_7mix = stds_rack['A6'] # empty
-    SAMP_8mix = stds_rack['A6'] # empty
+    SAMP_1mix = stds_rack['B3'] # 1 rep = 2 lines of 6*20*1.10 = 132*2 = 264.
+    SAMP_2mix = stds_rack['B3'] # 2 reps = 4 lines of 6*20*1.10 = 132*4 = 528
+    SAMP_3mix = stds_rack['B4'] # 3 reps of 6 lines of 6*20*1.10 = 132*6 = 792
+    SAMP_4mix = stds_rack['B4'] # 4 reps of 8 lines of 6*20*1.10 = 132*8 = 1056
+    SAMP_5mix = stds_rack['B4'] # empty
+    SAMP_6mix = stds_rack['B4'] # empty
+    SAMP_7mix = stds_rack['D6'] # empty
+    SAMP_8mix = stds_rack['D6'] # empty
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
-    num_of_sample_reps_per_holder = 4 # can't exceed 6
+    num_of_sample_reps_per_holder = 6 # can't exceed 6
     # holderList = [holder_1, holder_2, holder_3, holder_4]
     holderList = [holder_1, holder_2]
     # holderList = [holder_1]
