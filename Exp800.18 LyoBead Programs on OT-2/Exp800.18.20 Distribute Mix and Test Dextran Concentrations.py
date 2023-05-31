@@ -162,7 +162,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.mix(3, 200, LU_Mix.bottom(h_list[0]))
     for h, tube in enumerate(conds):
         # print ("tip height in tube is:", h_list[h])
-        p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[h]), rate=0.75) # 8*14*excess = 117.6ul
+        p300.aspirate(8*14*excess, LU_Mix.bottom(h_list[h]), rate=0.75) # 8*14*excess = 120.96ul
         p300.touch_tip(v_offset=-3, speed=30)
         p300.dispense(8*14*excess, tube.bottom(1))
         p300.blow_out(tube.bottom(8))
