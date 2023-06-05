@@ -34,12 +34,12 @@ def run(protocol: protocol_api.ProtocolContext):
     # sds_rack  @ position 2
     SAMP_1mix = stds_rack['B3'] # 1 rep = 2 lines of 6*20*1.10 = 132*2 = 264.
     SAMP_2mix = stds_rack['B3'] # 2 reps = 4 lines of 6*20*1.10 = 132*4 = 528
-    SAMP_3mix = stds_rack['B4'] # 3 reps of 6 lines of 6*20*1.10 = 132*6 = 792
+    SAMP_3mix = stds_rack['B3'] # 3 reps of 6 lines of 6*20*1.10 = 132*6 = 792
     SAMP_4mix = stds_rack['B4'] # 4 reps of 8 lines of 6*20*1.10 = 132*8 = 1056
     SAMP_5mix = stds_rack['B4'] # empty
     SAMP_6mix = stds_rack['B4'] # empty
-    SAMP_7mix = stds_rack['D6'] # empty
-    SAMP_8mix = stds_rack['D6'] # empty
+    SAMP_7mix = stds_rack['B5'] # empty
+    SAMP_8mix = stds_rack['B5'] # empty
     
     # user inputs
     # num_of_sample_reps is another way of stating number of strips
