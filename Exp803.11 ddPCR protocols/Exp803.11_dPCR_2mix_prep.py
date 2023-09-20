@@ -67,6 +67,8 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # LISTS
     mixes_list = [mix_one, mix_two]
+    mix_one_nanoplate_list = [nano_one_plate, nano_one_dup_plate]
+    mix_two_nanoplate_list = [nano_two_plate, nano_two_dup_plate]
     # 24 samples from the plate from A1 to H3, can specific specific wells and pos controls
     deepwell_wells = [
         'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1',
@@ -76,12 +78,10 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # #### COMMANDS ######
     # Experiment overview
-    #1-1 66ul mmix added to wells A1 to H3. 
-    #1-2 22ul DNA added to wells A1 to H3 from deepwell plate.
-    #1-3 Samples mixed and added to nano plates
+    # 1-1 66ul mmix added to wells A1 to H3. 
+    # 1-2 22ul DNA added to wells A1 to H3 from deepwell plate, samples mied and added to nano plates
 
-    # 1-1 66ul mmix added to wells A1 to H3.
-    
+    # 1-1 66ul mmix added to wells A1 to H3.    
     for tubeNumber, mmix in enumerate(mixes_list):
         mmix_heights = tip_heightsEpp(1696.7, 24, 66)
         p300.pick_up_tip()
@@ -103,5 +103,31 @@ def run(protocol: protocol_api.ProtocolContext):
                 hcounter += 1
         p300.drop_tip()
 
-
+    # 1-2 22ul DNA added to wells A1 to H3 from deepwell plate, samples mied and added to nano plates
+    for mixNumber, mmix in enumerate(mixes_list):
+        pos = 0 # this counter is important for the deepwell_wells list
+        if mixNumber == 0: 
+            col_begin = 1
+            col_end = 4
+            nanoplates = mix_one_nanoplate_list # if mix one, then add to hf183 plates
+        else: 
+            col_begin = 4
+            col_end = 7
+            nanoplates = mix_two_nanoplate_list # if mix two, then add to sketa plates
+        for row in 'ABCDEFGH':
+            for col in range(col_begin, col_end):
+                well = row+str(col)
+                p300.pick_up_tip()
+                p300.aspirate(22, deepwell[deepwell_wells[pos]])
+                p300.dispense(22, mixplate[well])
+                p300.mix(2, 80, mixplate[well].bottom(1))
+                p300.aspirate(85, mixplate[well].bottom(0.5), rate=0.65)
+                protocol.delay(seconds=2)
+                p300.dispense(2, mixplate[well].bottom(0.5), rate=0.65)
+                # dispense 40ul aliquot to each nanoplate
+                for nanoplate in nanoplates:
+                    p300.dispense(40, nanoplate[well].bottom(2))
+                    p300.touch_tip(nanoplate[well], v_offset=-2)                    
+                p300.drop_tip()
+                pos += 1
 
