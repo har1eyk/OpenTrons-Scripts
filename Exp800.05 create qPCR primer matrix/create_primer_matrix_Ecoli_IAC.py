@@ -154,7 +154,7 @@ def run(protocol: protocol_api.ProtocolContext):
     orig_P_conc = 10 # What is probe starting concentration? (in uM)
     std_F_conc = 300 # What is the constant F primer concentration for standards? This should be guess or from literature. (in nM)
     std_R_cond = 300 # What is the constant R primer concentration for standards? This should be guess or from literature. (in nM)
-    P_conc = 300 # EvaGreen: no probe
+    P_conc = 300 # probe
     tot_stds = 21 # How many wells of standards will be run? (in # wells)
     tot_NTCs = 3 # How many wells of NTCs will be run? (in # wells)
     tot_samp = 72 # How many samples with varying conditions will be run? (in # wells)
