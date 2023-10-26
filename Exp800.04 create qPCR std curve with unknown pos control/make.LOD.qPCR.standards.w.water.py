@@ -127,7 +127,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # water rack
     water = water_rack['A3'] # 20mL water in 50mL conical tube, 900*15 = 13500ul: 300*5 = 1500ul = 15mL
-    dilution_tube = std_8 # this is the tube used for LOD series; usually Tube_11.
+    dilution_tube = std_11 # this is the tube used for LOD series; usually Tube_11.
     # Positive Control Rack 
     pos_control = pos_rack['A1'] # 100-1000ul pos control @1uM
     
