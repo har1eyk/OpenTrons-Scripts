@@ -247,6 +247,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # print ('std_mix_heights', std_mix_heights)
     print ('mix_sn_tot', mix_sn_tot)
     print ('mix_bw_XFR_mix_sn', mix_bw_XFR_mix_sn)
+    print ('std_vol_F_mix', std_vol_F_mix)
+    print ('std_dna_XFR_to_std_int', std_dna_XFR_to_std_int)
     # lists
     # plate_col = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
     F_samp_vols = [F_upp_mix, F_mid_mix, F_low_mix]
@@ -284,13 +286,13 @@ def run(protocol: protocol_api.ProtocolContext):
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
         blowout_location='destination well')
-    # transfer F primer @ std conditions to sN__mix
+
     p20.transfer(
         std_vol_F_mix, #at 300nM, 8.3ul
         fwd_10uM.bottom(3), 
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
-        mix_after=(2, 30),
+        mix_after=(2, 10),
         blowout_location='destination well')
     # transfer R primer @ std conditions to sN__mix
     p20.transfer( #some resid fluid on outside
@@ -298,7 +300,7 @@ def run(protocol: protocol_api.ProtocolContext):
         rev_10uM.bottom(3), 
         sN_mix.bottom(tip_heights(mix_bw_XFR_mix_sn, 1, 0)[0]),
         blow_out=True,
-        mix_after=(2, 30), 
+        mix_after=(2, 10), 
         blowout_location='destination well')
         # transfer Probe @ std conditions to sN__mix
     p20.transfer( #some resid fluid on outside
