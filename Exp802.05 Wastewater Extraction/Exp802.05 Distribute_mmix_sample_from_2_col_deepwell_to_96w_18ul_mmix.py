@@ -43,7 +43,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # sample_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '4')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
     tempdeck = protocol.load_module('tempdeck', '10')
-    pcr_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
+    # pcr_plate = tempdeck.load_labware('abi_96_wellplate_250ul')
+    pcr_plate = tempdeck.load_labware('bioer_96_aluminumblock_200ul')
     ww_plate1 = protocol.load_labware('bioer_96_wellplate_2200ul', '1')
 
     # PIPETTES
