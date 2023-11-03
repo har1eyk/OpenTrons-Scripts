@@ -52,7 +52,7 @@ def tip_heights(init_vol, steps, vol_dec):
 def run(protocol: protocol_api.ProtocolContext):
 
     # LABWARE
-    mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
+    # mix_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '1')
     fuge_rack = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
     tiprack20 = protocol.load_labware('opentrons_96_filtertiprack_20ul', '9')
@@ -126,7 +126,6 @@ def run(protocol: protocol_api.ProtocolContext):
     # add pos control stds to PROBE mmxs into plate wells and dispense into neighboring wells
     for i in range(len(std_wells)): #loop 13x, water tube last
         p20.pick_up_tip()
-        p300.pick_up_tip() #double barrel
         # p20.pick_up_tip()
         p20.aspirate(multisample_mix, std_wells[i].bottom(15))
         p20.move_to(std_wells[i].bottom(30))
@@ -135,17 +134,10 @@ def run(protocol: protocol_api.ProtocolContext):
         p20.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2))
         p20.blow_out(stds_plate[probe_wells[i]].bottom(10))
         p20.move_to(stds_plate[probe_wells[i]].bottom(2)) #remove fluid
-
-        # p300.aspirate(multisample_mix, std_wells[i].bottom(20)) # transer 8ul from oligo mix to mmix spot
-        # p300.touch_tip() 
-        # p300.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2), rate=0.6) #dispense into 54ul in sybr_wells[i] on plate
-        protocol.delay(seconds=2)
-        # p20.mix(2, 20, stds_plate[probe_wells[i]].bottom(4)) # remove inside soln
-        # p20.move_to(stds_plate[probe_wells[i]].bottom(10)) #above mmix solution
-        # protocol.delay(seconds=2)
-        # p300.blow_out(stds_plate[probe_wells[i]].bottom(14))
-        # p300.touch_tip()
-        # p300.move_to(stds_plate[probe_wells[i]].bottom(40)) # add this so it doesn't crash into plate
+        p20.mix(2, 20, stds_plate[probe_wells[i].bottom(2)]) #rinse tip of residual DNA
+        p20.drop_tip() # new tip to ensure homogeneity
+        p20.pick_up_tip()
+        p300.pick_up_tip() #double barrel, baby! Yeah!
         p300.mix(4, 50, stds_plate[probe_wells[i]].bottom(1), rate=0.5) # can't be mixed homogenously with p20 #ivetried
         p300.move_to(stds_plate[probe_wells[i]].bottom(12)) #above mmix solution
         protocol.delay(seconds=2) #outside fluid coalesce 
@@ -155,6 +147,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # p300.touch_tip()
         # transfer to adjacent wells
         for x in range(1,5): # need int 1, 2, 3 and 4.
+            p20.mix(2,20,stds_plate[probe_wells[i].bottom(3)]) # pre-wet tip
             p20.aspirate(20, stds_plate[probe_wells[i]].bottom(1), rate=0.75) # asp from 54ul, dispense to neighbor well
             protocol.delay(seconds=2) #equilibrate
             # find digits in well, A1 and A10 and puts into list
