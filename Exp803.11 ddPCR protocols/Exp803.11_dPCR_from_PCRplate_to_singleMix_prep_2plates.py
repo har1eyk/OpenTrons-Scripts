@@ -70,9 +70,9 @@ def run(protocol: protocol_api.ProtocolContext):
     # mix_two_nanoplate_list = [nano_two_plate, nano_two_dup_plate]
     # 24 samples from the plate from A1 to H3, specific wells and pos controls
     samplePlate_wells = [
-        'A4', 'B4', 'C4', 'D4', 'A1', 'B1', 'C1', 'D1',
-        'E1', 'F1', 'G1', 'H1', 'A2', 'B2', 'C2', 'D2',
-        'E6', 'F6', 'G6', 'H6', 'E4', 'F4', 'A12', 'H12'
+        'A1', 'B1', 'C1', 'D1', 'G1', 'H1', 'A3', 'B3',
+        'A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'A7', 'B7',
+        'B7', 'B7', 'B7', 'F5', 'F5', 'C7', 'A12', 'H12'
         ] 
     nanoplate_wells = [
         'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1',
@@ -114,8 +114,8 @@ def run(protocol: protocol_api.ProtocolContext):
             p300.pick_up_tip()
             p300.aspirate(22, samplePlate[samplePlate_wells[pos]])
             protocol.delay(seconds=1)
-            p300.dispense(22, mixplate[well].bottom(2))
-            p300.mix(3, 80, mixplate[well].bottom(2), rate=0.5)
+            p300.dispense(22, mixplate[well].bottom(1))
+            p300.mix(3, 80, mixplate[well].bottom(1), rate=0.5)
             p300.aspirate(85, mixplate[well].bottom(1), rate=0.65)
             protocol.delay(seconds=2)
             p300.dispense(2, mixplate[well].bottom(2), rate=0.65)
@@ -123,7 +123,7 @@ def run(protocol: protocol_api.ProtocolContext):
             # dispense 40ul aliquot to each nanoplate
             for nanoplate in mix_one_nanoplate_list:
                 p300.dispense(40, nanoplate[nanoplate_wells[pos]].bottom(2))
-                p300.touch_tip(nanoplate[nanoplate_wells[pos]], v_offset=-2)                    
+                p300.touch_tip(nanoplate[nanoplate_wells[pos]], v_offset=-2, speed=40) # slow it down; don't want tip to flip-tick material into adj wells                    
             p300.drop_tip()
             pos += 1
 
