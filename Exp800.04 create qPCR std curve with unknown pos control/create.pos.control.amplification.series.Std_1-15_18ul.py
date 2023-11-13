@@ -106,22 +106,22 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ### COMMANDS ######
     # Mix, pipette mastermix containing probe to each well on plate 
-    p300.pick_up_tip()
-    p300.mix(3, 200, mmix.bottom(20)) #first height
-    for well, h in zip(probe_wells, tip_heights(1584, len(std_wells), multiwell_mix)):
-        p300.aspirate(multiwell_mix, mmix.bottom(h), rate=0.75) # 18 * 4 = 72 + 9 =81ul
-        protocol.delay(seconds=2) #tip equilibrate
-        p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
-        protocol.delay(seconds=2) #tip droplets slide
-        p300.move_to(mmix.bottom(h)) # excess tip fluid condense 
-        p300.touch_tip(v_offset=-4) #touch 4 mm below surface
-        for volD, heightD in d_dispense(multiwell_mix, 6, 6):
-            p300.dispense(volD, stds_plate[well].bottom(heightD))
-        # p300.dispense(multiwell_mix, stds_plate[well])
-        p300.blow_out(stds_plate[well].bottom(12))
-        p300.move_to(stds_plate[well].bottom(2))
-        p300.touch_tip()
-    p300.drop_tip()
+    # p300.pick_up_tip()
+    # p300.mix(3, 200, mmix.bottom(20)) #first height
+    # for well, h in zip(probe_wells, tip_heights(1584, len(std_wells), multiwell_mix)):
+    #     p300.aspirate(multiwell_mix, mmix.bottom(h), rate=0.75) # 18 * 4 = 72 + 9 =81ul
+    #     protocol.delay(seconds=2) #tip equilibrate
+    #     p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
+    #     protocol.delay(seconds=2) #tip droplets slide
+    #     p300.move_to(mmix.bottom(h)) # excess tip fluid condense 
+    #     p300.touch_tip(v_offset=-4) #touch 4 mm below surface
+    #     for volD, heightD in d_dispense(multiwell_mix, 6, 6):
+    #         p300.dispense(volD, stds_plate[well].bottom(heightD))
+    #     # p300.dispense(multiwell_mix, stds_plate[well])
+    #     p300.blow_out(stds_plate[well].bottom(12))
+    #     p300.move_to(stds_plate[well].bottom(2))
+    #     p300.touch_tip()
+    # p300.drop_tip()
     
     # add pos control stds to PROBE mmxs into plate wells and dispense into neighboring wells
     for i in range(len(std_wells)): #loop 13x, water tube last
@@ -134,7 +134,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p20.dispense(multisample_mix, stds_plate[probe_wells[i]].bottom(2))
         p20.blow_out(stds_plate[probe_wells[i]].bottom(10))
         p20.move_to(stds_plate[probe_wells[i]].bottom(2)) #remove fluid
-        p20.mix(2, 20, stds_plate[probe_wells[i].bottom(2)]) #rinse tip of residual DNA
+        p20.mix(2, 20, stds_plate[probe_wells[i]].bottom(2)) #rinse tip of residual DNA
         p20.drop_tip() # new tip to ensure homogeneity
         p20.pick_up_tip()
         p300.pick_up_tip() #double barrel, baby! Yeah!
@@ -147,7 +147,7 @@ def run(protocol: protocol_api.ProtocolContext):
         # p300.touch_tip()
         # transfer to adjacent wells
         for x in range(1,5): # need int 1, 2, 3 and 4.
-            p20.mix(2,20,stds_plate[probe_wells[i].bottom(3)]) # pre-wet tip
+            p20.mix(2,20,stds_plate[probe_wells[i]].bottom(3)) # pre-wet tip
             p20.aspirate(20, stds_plate[probe_wells[i]].bottom(1), rate=0.75) # asp from 54ul, dispense to neighbor well
             protocol.delay(seconds=2) #equilibrate
             # find digits in well, A1 and A10 and puts into list
