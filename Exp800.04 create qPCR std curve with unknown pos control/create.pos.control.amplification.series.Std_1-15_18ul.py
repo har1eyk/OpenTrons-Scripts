@@ -106,22 +106,22 @@ def run(protocol: protocol_api.ProtocolContext):
 
     ### COMMANDS ######
     # Mix, pipette mastermix containing probe to each well on plate 
-    # p300.pick_up_tip()
-    # p300.mix(3, 200, mmix.bottom(20)) #first height
-    # for well, h in zip(probe_wells, tip_heights(1584, len(std_wells), multiwell_mix)):
-    #     p300.aspirate(multiwell_mix, mmix.bottom(h), rate=0.75) # 18 * 4 = 72 + 9 =81ul
-    #     protocol.delay(seconds=2) #tip equilibrate
-    #     p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
-    #     protocol.delay(seconds=2) #tip droplets slide
-    #     p300.move_to(mmix.bottom(h)) # excess tip fluid condense 
-    #     p300.touch_tip(v_offset=-4) #touch 4 mm below surface
-    #     for volD, heightD in d_dispense(multiwell_mix, 6, 6):
-    #         p300.dispense(volD, stds_plate[well].bottom(heightD))
-    #     # p300.dispense(multiwell_mix, stds_plate[well])
-    #     p300.blow_out(stds_plate[well].bottom(12))
-    #     p300.move_to(stds_plate[well].bottom(2))
-    #     p300.touch_tip()
-    # p300.drop_tip()
+    p300.pick_up_tip()
+    p300.mix(3, 200, mmix.bottom(20)) #first height
+    for well, h in zip(probe_wells, tip_heights(1584, len(std_wells), multiwell_mix)):
+        p300.aspirate(multiwell_mix, mmix.bottom(h), rate=0.75) # 18 * 4 = 72 + 9 =81ul
+        protocol.delay(seconds=2) #tip equilibrate
+        p300.move_to(mmix.bottom(35)) # excess tip fluid condense 
+        protocol.delay(seconds=2) #tip droplets slide
+        p300.move_to(mmix.bottom(h)) # excess tip fluid condense 
+        p300.touch_tip(v_offset=-4) #touch 4 mm below surface
+        for volD, heightD in d_dispense(multiwell_mix, 6, 6):
+            p300.dispense(volD, stds_plate[well].bottom(heightD))
+        # p300.dispense(multiwell_mix, stds_plate[well])
+        p300.blow_out(stds_plate[well].bottom(12))
+        p300.move_to(stds_plate[well].bottom(2))
+        p300.touch_tip()
+    p300.drop_tip()
     
     # add pos control stds to PROBE mmxs into plate wells and dispense into neighboring wells
     for i in range(len(std_wells)): #loop 13x, water tube last
