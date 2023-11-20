@@ -100,14 +100,14 @@ def run(protocol: protocol_api.ProtocolContext):
     # WATER = mix_rack['A1'] # 1500ul WATER
        
     #fuge_rack
-    samp_1 = fuge_rack['A6'] # e.g. 0.625uM # empty
-    samp_2 = fuge_rack['B4'] # e.g. 1.25uM # empty
+    samp_1 = fuge_rack['B2'] # e.g. 0.625uM # empty
+    samp_2 = fuge_rack['B3'] # e.g. 1.25uM # empty
     samp_3 = fuge_rack['D1'] # e.g. 2.5uM # empty
     samp_4 = fuge_rack['D2'] # e.g. 5.0uM # empty
     samp_5 = fuge_rack['D3'] # e.g. 7.5uM # empty
     samp_6 = fuge_rack['D4'] # e.g. 10uM # empty
-    samp_7 = fuge_rack['B5'] # e.g. 10uM # empty
-    samp_8 = fuge_rack['D6'] # e.g. 10uM # empty
+    samp_7 = fuge_rack['D5'] # e.g. 10uM # empty
+    samp_8 = fuge_rack['B4'] # e.g. 10uM # empty
     
     # user inputs
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -120,23 +120,23 @@ def run(protocol: protocol_api.ProtocolContext):
     
     # 1.1 add 18ul MMIX to 96 wells
     p20.pick_up_tip()
-    tubeH = tip_heightsEpp(1800, 96, 18)
+    tubeH = tip_heightsEpp(2000, 96, 18) #shan't go higher than 2000ul 
     h_counter = 0
     p20.mix(2, 20, mmix.bottom(tubeH[h_counter]))
     for row in rows:
-        for col in range(12):
-            p20.aspirate(18, mmix.bottom(tubeH[h_counter]))
-            protocol.delay(seconds=1) #equilibrate
-            # p20.move_to(mmix.bottom(tubeH[h_counter]+10)) # suspend above mix; droplets coalesce
-            p20.move_to(mmix.top(-4)) # suspend above mix; droplets coalesce
-            protocol.delay(seconds=2)
-            p20.touch_tip(v_offset=-4, speed=40)
-            # p20.move_to(mmix.bottom(tubeH[h_counter])) # remove fluid my dipping in mix
-            dest = row + str(col+1)
-            p20.dispense(18, plate[dest].bottom(3))
-            p20.blow_out(plate[dest].bottom(8))
-            p20.move_to(plate[dest].bottom(3)) # remove traces of mmix
-            h_counter +=1
+       for col in range(12):
+           p20.aspirate(18, mmix.bottom(tubeH[h_counter]))
+           protocol.delay(seconds=1) #equilibrate
+           # p20.move_to(mmix.bottom(tubeH[h_counter]+10)) # suspend above mix; droplets coalesce
+           p20.move_to(mmix.top(-4)) # suspend above mix; droplets coalesce
+           protocol.delay(seconds=2)
+           p20.touch_tip(v_offset=-4, speed=40)
+           # p20.move_to(mmix.bottom(tubeH[h_counter])) # remove fluid my dipping in mix
+           dest = row + str(col+1)
+           p20.dispense(18, plate[dest].bottom(3))
+           p20.blow_out(plate[dest].bottom(8))
+           p20.move_to(plate[dest].bottom(3)) # remove traces of mmix
+           h_counter +=1
     p20.drop_tip()
     
     # 1.2 2ul added to every sample, row-by-row
