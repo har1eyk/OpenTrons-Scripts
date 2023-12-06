@@ -127,7 +127,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # water rack
     water = water_rack['A3'] # 20mL water in 50mL conical tube, 900*15 = 13500ul: 300*5 = 1500ul = 15mL
-    dilution_tube = std_9 # this is the tube used for LOD series; usually Tube_11.
+    dilution_tube = std_10 # this is the tube used for LOD series; usually Tube_11.
     # Positive Control Rack 
     pos_control = pos_rack['A1'] # 100-1000ul pos control @1uM
     
@@ -190,7 +190,7 @@ def run(protocol: protocol_api.ProtocolContext):
         protocol.delay(seconds =2)
         p300.move_to(dilution_tube.bottom(15)) # move up to allow droplets to coalesce 
         p300.move_to(dilution_tube.bottom(8)) # touch to remove fluid
-        p300.dispense(150, std_11_1.bottom(8))
+        p300.dispense(150, std_11_1.bottom(5))
         p300.mix(2, 200, std_11_1.bottom(8))
         p300.blow_out(std_11_1.bottom(15))
         p300.touch_tip()
