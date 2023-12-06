@@ -73,9 +73,9 @@ def run(protocol: protocol_api.ProtocolContext):
     #     'B7', 'B7', 'B7', 'F5', 'F5', 'C7', 'A12', 'H12'
     #     ] 
     sampleRack_wells = [
-        'B4', 'D1', 'D2', 'D3', 'D4', 'D5', 'B5', 'B6',
-        'B4', 'D1', 'D2', 'D3', 'D4', 'D5', 'B5', 'B6',
-        'B4', 'D1', 'D2', 'D3', 'D4', 'D5', 'B5', 'B6'
+        'A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2',
+        'A3', 'B3', 'C3', 'A5', 'B5', 'C5', 'D5', 'A6',
+        'B6', 'C6', 'D6', 'A6', 'B6', 'C6', 'A6', 'B6'
         ] 
     nanoplate_wells = [
         'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1',
@@ -101,7 +101,7 @@ def run(protocol: protocol_api.ProtocolContext):
         p300.touch_tip(mmix, v_offset=-4)
         for col in range(1,4):
             well = row+str(col)
-            p300.dispense(66, mixplate[well].bottom(2), rate=0.7)
+            p300.dispense(66, mixplate[well].bottom(4), rate=0.7)
             protocol.delay(seconds=2) #equilibrate
             p300.touch_tip(mixplate[well], v_offset=-2)
         p300.dispense(2, mmix.bottom(mmix_heights[hcounter]))
@@ -115,11 +115,14 @@ def run(protocol: protocol_api.ProtocolContext):
         for row in 'ABCDEFGH':
             well = row+str(col)
             p300.pick_up_tip()
-            p300.aspirate(22, sampleRack[sampleRack_wells[pos]].bottom(4))
+            p300.aspirate(22, sampleRack[sampleRack_wells[pos]].bottom(2))
             p300.touch_tip(sampleRack[sampleRack_wells[pos]], v_offset=-3, speed=80)
             protocol.delay(seconds=1)
             p300.dispense(22, mixplate[well].bottom(1))
-            p300.mix(3, 80, mixplate[well].bottom(1), rate=0.5)
+            p300.mix(2, 70, mixplate[well].bottom(1), rate=0.5)
+            p300.drop_tip()
+            p300.pick_up_tip() # shuck tip to remove variability
+            p300.mix(2, 80, mixplate[well].bottom(1), rate=0.5)
             p300.aspirate(85, mixplate[well].bottom(1), rate=0.65)
             protocol.delay(seconds=2)
             p300.dispense(2, mixplate[well].bottom(2), rate=0.65)
