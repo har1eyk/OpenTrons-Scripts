@@ -154,8 +154,8 @@ def run(protocol: protocol_api.ProtocolContext):
         for col in range(0,12,6):
             sample = samp_sources[source_counter] # this selects the source tube e.g. stds
             p20.pick_up_tip()
-            p20.mix(1,20, sample.bottom(2)) # pre-wetting tip is more accurate
-            p20.aspirate(18, sample.bottom(2))
+            p20.mix(2,20, sample.bottom(2)) # pre-wetting tip is more accurate
+            p20.aspirate(16, sample.bottom(2))
             destOne = row + str(col+1)
             destTwo = row + str(col+2)
             destThree = row + str(col+3)
