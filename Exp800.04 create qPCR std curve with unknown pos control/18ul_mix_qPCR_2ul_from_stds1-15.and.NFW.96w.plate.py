@@ -50,32 +50,18 @@ def tip_heightsEpp(init_vol, steps, vol_dec):
     if init_vol > 2000:
         offset = 12 # model out of range; see sheet
     else:
-        offset = 11 #mm Need to add offset to ensure tip reaches below liquid level
+        offset = 7 #mm Need to add offset to ensure tip reaches below liquid level
     for i in range(steps):
         x = init_vol-vol_dec*i
         vols.append(x)
         h = p5*x**5+p4*x**4+p3*x**3+p2*x**2+p1*x**1 + p0
         h = h-offset
-        if h < 8: # prevent negative heights; go to bottom to avoid air aspirant above certain height
+        if h < 4: # prevent negative heights; go to bottom to avoid air aspirant above certain height
             h = 0        
             heights.append(h)
         else:
             heights.append(round(h, 1))
     return heights
-
-#
-    n =1
-    if tot/n > max_vol: # if total greater than max
-       while tot/n > max_vol: # increment n until some tot/n < max_vol
-            n+=1
-            if tot/n == max_vol: # if tot evently divided e.g. 1000
-                subvol = tot/n
-                return [subvol]*n
-            if tot/(n+1) < max_vol: # if tot <> evenly divided e.g. 417.3
-                subvol = tot/(n+1)
-                return [subvol]*(n+1) # return # aspiration steps
-    else: # if total less than max
-        return [tot/n]
 
 def run(protocol: protocol_api.ProtocolContext):
 
@@ -130,6 +116,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # 1.1 add 18ul MMIX to 96 wells
     p20.pick_up_tip()
     tubeH = tip_heightsEpp(2000, 96, 18) #shan't go higher than 2000ul 
+    print ("tubeHeights:", tubeH)
     h_counter = 0
     p20.mix(2, 20, mmix.bottom(tubeH[h_counter]))
     for row in rows:
