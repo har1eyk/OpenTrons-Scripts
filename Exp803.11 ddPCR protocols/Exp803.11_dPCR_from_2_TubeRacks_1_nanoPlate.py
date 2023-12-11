@@ -3,7 +3,7 @@ from opentrons import protocol_api
 
 # metadata
 metadata = {
-    'protocolName': 'Uses a 1 Mix and 2 Tube Racks to Add to 1 Qiagen 24w, 26k NanoPlate.',
+    'protocolName': 'dPCR--Add 1 Mix and 2 Tube Racks to 1 Qiagen 24w, 26k NanoPlate.',
     'author': 'Harley King <harley.king@luminultra.com>',
     'description': '66 ul master mix dispensed into 24wells. 22ul of DNA added to wells, mixed and added to 1 Qiagen Nanoplate.',
     'apiLevel': '2.12'
@@ -41,10 +41,10 @@ def run(protocol: protocol_api.ProtocolContext):
     # LABWARE
     tempdeck = protocol.load_module('tempdeck', '10') 
     mixplate = tempdeck.load_labware('bioer_96_aluminumblock_200ul')
-
-    # samplePlate = protocol.load_labware('bioermounted20ulfiltertipbox_96_wellplate_200ul', '4')
+    # not all 1.5mL tubes created equal. Avoid the tubes with the square hinge. V-hinge ok. 
     sampleRackOne = protocol.load_labware('vwr_24_tuberack_1500ul', '4')
     sampleRackTwo = protocol.load_labware('vwr_24_tuberack_1500ul', '2')
+
     mastermixes = protocol.load_labware('opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap', '11')
     tiprack300 = protocol.load_labware('opentrons_96_filtertiprack_200ul', '8')
 
@@ -138,9 +138,9 @@ def run(protocol: protocol_api.ProtocolContext):
         nanoplate_well_1, nanoplate_well_2 = sample_to_well_pairs[pos]
         # Dispense into the two wells of the same nanoplate
         p300.dispense(40, single_nanoplate[nanoplate_well_1].bottom(2))
-        p300.touch_tip(single_nanoplate[nanoplate_well_1], v_offset=-2, speed=40) # slow it down; don't want tip to flip-tick material into adj wells                    
+        p300.touch_tip(single_nanoplate[nanoplate_well_1], v_offset=-2, speed=20) # slow it down; don't want tip to flip-tick material into adj wells                    
         p300.dispense(40, single_nanoplate[nanoplate_well_2].bottom(2))
-        p300.touch_tip(single_nanoplate[nanoplate_well_2], v_offset=-2, speed=40) # slow it down; don't want tip to flip-tick material into adj wells                    
+        p300.touch_tip(single_nanoplate[nanoplate_well_2], v_offset=-2, speed=20) # slow it down; don't want tip to flip-tick material into adj wells                    
         p300.drop_tip()
         pos +=1
         
