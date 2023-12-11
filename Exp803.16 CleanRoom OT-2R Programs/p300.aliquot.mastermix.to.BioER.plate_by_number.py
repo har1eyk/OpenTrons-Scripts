@@ -131,9 +131,9 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # USER INPUTS
     dispVol = 20 # this is the volume dispensed into each well min = 14.5, max = 20
-    mmixVol = 2208 # this is the total volume in 2mL tube. Probably listed on recipe sheet. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul; For 20ul in 96w plate = 20*96 = *1.15= 2208ul
+    mmixVol = 2000 # this is the total volume in 2mL tube. Probably listed on recipe sheet. For 14.5ul in 96w plate = 14.5*96 = *1.15= 1600.8ul; For 20ul in 96w plate = 20*96 = *1.15= 2208ul
     rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-    dispNumberWells = 32 # number of wells to dispense into
+    dispNumberWells = 96 # number of wells to dispense into
     dispNumberColumns =dispNumberWells//8 # number of columns to dispense into
     
     #### COMMANDS ######
@@ -147,13 +147,14 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.mix(2, 200, mmix.bottom(mmixH[0])) # a pre-moistened tip is more accurate. 
     i = 0 # height counter
     for col in range(dispNumberColumns):# loops through sliced or all columns on plate
-        p300.aspirate(200, mmix.bottom(mmixH[i])) # could aspirate dispVol*10
-        p300.move_to(mmix.bottom(mmixH[i]+20))
-        protocol.delay(seconds=3)
-        p300.dispense(dispVol, mmix.bottom(mmixH[i]+20)) # dispense dispVol back into tube to improve volume accuracy in subsequent dispenses
-        protocol.delay(seconds=3) # tip for drops to coalesce
-        p300.move_to(mmix.bottom(mmixH[i])) # touch tip to remove droplets
+        # aspirate and prepare tip and remove residual droplets
+        p300.aspirate(200, mmix.bottom(mmixH[i]), rate=0.65) # could aspirate dispVol*10
+        protocol.delay(seconds=2) #equilibrate
+        p300.dispense(dispVol, mmix.bottom(mmixH[i]), rate=0.8) # dispense dispVol back into tube to improve volume accuracy in subsequent dispenses
+        protocol.delay(seconds=1) #equilibrate
+        # p300.touch_tip(mmix, v_offset=-3, speed=60)
         p300.touch_tip(mmix, v_offset=-5, speed=20)
+        # dispense in column-wise manner
         for dispNo in range(8): # how many dispenses? (200-dispVol (15.8)= 184.2/15.8 = 11 )
             dest = plate[rows[dispNo]+str(col+1)] # destination well
             p300.move_to(dest.bottom(40)) # move to destination and pause for a few seconds to remove lateral motion
@@ -164,7 +165,6 @@ def run(protocol: protocol_api.ProtocolContext):
             protocol.delay(seconds=1)
             p300.move_to(dest.bottom(3)) # remove excess fluid from tip
         p300.move_to(mmix.bottom(mmixH[i]+10)) # drop waste mix back into tube
-        p300.dispense((200-9*dispVol), mmix.bottom(mmixH[i]+10))
         p300.blow_out(mmix.bottom(mmixH[i]+4))
         p300.move_to(mmix.bottom(mmixH[i])) # touch tip to fluid to remove residual mmix on tubes
         i+=1 # increment height counter
