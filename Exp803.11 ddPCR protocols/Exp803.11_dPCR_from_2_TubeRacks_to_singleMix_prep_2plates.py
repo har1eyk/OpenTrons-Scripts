@@ -136,11 +136,14 @@ def run(protocol: protocol_api.ProtocolContext):
                 break  # No more samples
 
             p300.aspirate(22, sample_rack[rack_well].bottom(2))
+            p300.dispense(22, mixplate[well].bottom(2), rate=0.65)
+            p300.mix(2, 22, mixplate[well].bottom(2), rate=0.65) #rinse tip
+            p300.blow_out(mixplate[well].bottom(5))
             p300.drop_tip()
             p300.pick_up_tip() # shuck tip to remove variability
             p300.mix(2, 80, mixplate[well].bottom(1), rate=0.5)
             p300.aspirate(85, mixplate[well].bottom(1), rate=0.65)
-            protocol.delay(seconds=2)
+            protocol.delay(seconds=1)
             p300.dispense(2, mixplate[well].bottom(2), rate=0.65)
             protocol.delay(seconds=1)
             # dispense 40ul aliquot to each nanoplate
