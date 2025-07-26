@@ -1,2 +1,2 @@
 # OpenTrons-Scripts
- A collection of helpful OpenTrons scripts for experimental Reproducibility. 
+ A collection of helpful OpenTrons scripts for experimental reproducibility. 
