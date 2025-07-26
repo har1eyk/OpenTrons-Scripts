@@ -1,2 +1,2 @@
 # OpenTrons-Scripts
- Harley's collection of helpful OpenTrons scripts.
+ A collection of helpful OpenTrons scripts for experimental Reproducibility. 
